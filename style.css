@@ -8,19 +8,27 @@ body {
     font-family: Arial, Arial, Helvetica, sans-serif;
     color: #333;
     background-color: #f4f4f4;
+    font-size: 15px;
 }
 
 .container {
     display: flex;
-    max-width: 900px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 20px;
+    display: flex;
+    min-height: 100vh;
 }
 
 .sidebar {
     flex: 1;
     padding: 20px;
     border-right: 1px solid #ddd;
+    width: 200px; /* Adjust the width as needed */
+    min-width: 200px; /* Ensures sidebar is not too narrow */
+    max-width: 200px;
+    overflow: hidden;
+    background-color: #f4f4f4;
 }
 
     .sidebar ul {
@@ -34,14 +42,50 @@ body {
             display: block;
             padding: 10px;
         }
+
             .sidebar ul li a:hover {
-                background-color: #e2e2e2; 
+                background-color: #34a853;
+                color: #ffffff;
+                transition: background-color 1s ease;
             }
+
 .content {
-    flex-grow: 1;
-    padding: 20px;
+    flex-grow: 1; /* Takes up the remaining space */
+    padding: 20px 20px 20px 20px;
+    max-width: 700px; /* Limits the width on larger screens */
+    min-width: 400px;
+    overflow-x: hidden; /* Prevents horizontal overflow */
+    margin: 5px 5px 5px 5px;
 }
 
 section {
     margin-bottom: 20px;
 }
+
+.highlight {
+    font-size: 1.4em;
+    border-radius: 5px;
+    width: 300px;
+    padding: 13px;
+}
+
+.line_style {
+    margin: 10px auto 30px auto
+}
+
+.link-bar {
+    padding:12px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: #0000FF; /* Sets the text color to blue */
+}
+
+.link {
+    color: #34a853; /* Ensures the links are blue */
+    text-decoration: none; /* Removes underline from links */
+}
+
+    .link:hover {
+        text-decoration: underline; /* Adds underline on hover for better interactivity */
+    }
