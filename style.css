@@ -1,24 +1,47 @@
-html {
+* {
+    margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    padding: 0;
-    background-color: black;
-    color: white;
-    text-align: center;
+    font-family: Arial, Arial, Helvetica, sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
 }
 
-#hi {
-    padding: 10px;
-    background-color: red;
-    border-radius: 50px;
-    width: fit-content;
-    margin: 25px auto 25px auto;
+.container {
+    display: flex;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
 }
-.divimg {
-    height: 200px;
-    width: 200px;
-    border-radius: 50px;
-    margin: 10px;
+
+.sidebar {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            display: block;
+            padding: 10px;
+        }
+            .sidebar ul li a:hover {
+                background-color: #e2e2e2; 
+            }
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+section {
+    margin-bottom: 20px;
 }
