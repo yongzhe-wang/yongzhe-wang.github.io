@@ -22,18 +22,20 @@ body {
 
 .sidebar {
     flex: 1;
-    padding: 20px;
+    padding: 10px;
     border-right: 1px solid #ddd;
     width: 200px; /* Adjust the width as needed */
-    min-width: 200px; /* Ensures sidebar is not too narrow */
+    min-width: 200px; 
     max-width: 200px;
     overflow: hidden;
     background-color: #f4f4f4;
+    margin: 0px 0px 0px 10px;
 }
 
     .sidebar ul {
         list-style: none;
         padding: 0;
+        margin: 0px 10px 0px 0px;
     }
 
         .sidebar ul li a {
@@ -49,6 +51,13 @@ body {
                 transition: background-color 1s ease;
             }
 
+.highlight {
+    font-size: 1.4em;
+    border-radius: 5px;
+    width: 300px;
+    padding: 13px;
+}
+
 .content {
     flex-grow: 1; /* Takes up the remaining space */
     padding: 20px 20px 20px 20px;
@@ -62,12 +71,8 @@ section {
     margin-bottom: 20px;
 }
 
-.highlight {
-    font-size: 1.4em;
-    border-radius: 5px;
-    width: 300px;
-    padding: 13px;
-}
+
+
 
 .line_style {
     margin: 10px auto 30px auto
