@@ -162,6 +162,14 @@ em     { font-style: italic; }
 
 /* Home-specific lead + tagline
    -------------------------------------------------------------------------- */
+.home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  align-items: start;
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
 .home-lead {
   font-family: var(--font-mono);
   font-size: 1rem;
@@ -176,7 +184,17 @@ em     { font-style: italic; }
   font-size: 1.125rem;
   line-height: 1.75rem;
   color: var(--muted-foreground);
-  margin-bottom: 48px;
+  margin-bottom: 0;
+}
+
+.home-photo {
+  width: 132px;
+  height: 132px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(5%) contrast(1.02);
 }
 
 /* Timeline
@@ -225,7 +243,8 @@ em     { font-style: italic; }
   flex: 1;
 }
 
-.experience-logo {
+.experience-logo,
+.timeline-logo {
   position: relative;
   display: inline-grid;
   place-items: center;
@@ -245,7 +264,8 @@ em     { font-style: italic; }
   font-weight: 600;
 }
 
-.experience-logo img {
+.experience-logo img,
+.timeline-logo img {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -485,6 +505,16 @@ em     { font-style: italic; }
 
   .timeline-date {
     margin-top: 4px;
+  }
+
+  .home-intro {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .home-photo {
+    width: 116px;
+    height: 116px;
   }
 
   .about-portrait {
