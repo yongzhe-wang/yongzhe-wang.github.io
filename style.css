@@ -286,6 +286,20 @@ em     { font-style: italic; }
   grid-area: 1 / 1;
 }
 
+.timeline-logo-emoji {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.timeline-logo-emoji span {
+  /* reset inherited monospace so emoji renders via system emoji font */
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
 .timeline-title {
   font-family: var(--font-mono);
   font-weight: 600;
