@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../assets/favicon.png" sizes="256x256">
+  <link rel="icon" type="image/png" href="../assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../assets/favicon.png">
+  <title>Giving Claude the keys to my iOS Calendar &mdash; Andrew Wang</title>
+  <meta name="description" content="Why I built apple-calendar-mcp — an MCP server that lets Claude read and write my iOS Calendar through my Mac. Notes on AppleScript, stdout-as-transport, and the one bug that ate five of my events.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container">
+
+    <header class="site-header">
+      <a href="../index.html" class="site-title">Andrew Wang</a>
+      <nav class="site-nav">
+        <a href="../index.html">Home</a>
+        <a href="../how-i-think.html">How I Think</a>
+        <a href="../experience.html">Experience</a>
+        <a href="../blog.html" class="current">Blog</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </header>
+
+    <article>
+
+      <h1 class="page-title">Giving Claude the keys to my iOS Calendar</h1>
+      <p class="post-subtitle">April 2026</p>
+      <ul class="link-bar">
+        <li><a href="https://github.com/yongzhe-wang/apple-calendar-mcp" target="_blank" rel="noopener">GitHub repo</a></li>
+      </ul>
+
+      <div class="post-body">
+
+        <p>
+          I wanted Claude to put things on my iPhone calendar. Apple doesn't have a remote iOS Calendar API I can just call. So I built a small MCP server that bridges Claude to my Mac's Calendar.app via AppleScript, and let iCloud do the rest. I called it <strong>apple-calendar-mcp</strong>.
+        </p>
+
+        <h2>The problem</h2>
+
+        <p>
+          iOS Calendar has no public remote API. EventKit is device-local. CalDAV works but is painful and requires credentials I'd rather not hand to a model.
+        </p>
+
+        <p>
+          But my iPhone and my Mac are on the same iCloud calendar. Anything that lands in Calendar.app on my Mac shows up on my phone within seconds.
+        </p>
+
+        <p>
+          So the real question wasn't &ldquo;how do I reach iOS from Claude&rdquo; &mdash; it was &ldquo;how do I reach Calendar.app from an MCP server, cleanly.&rdquo;
+        </p>
+
+        <h2>The approach</h2>
+
+        <p>
+          MCP server running locally on my laptop. Six tools: <strong>list_calendars</strong>, <strong>list_events</strong>, <strong>search_events</strong>, <strong>create_event</strong>, <strong>update_event</strong>, <strong>delete_event</strong>.
+        </p>
+
+        <p>
+          The transport under all of them is <strong>osascript</strong> driving Calendar.app. No network. No cloud. No credentials. macOS's own permission prompt is the only access gate.
+        </p>
+
+        <h2>How it works</h2>
+
+        <p>
+          Each tool is a thin TypeScript function that builds an AppleScript string, escapes every user input, runs it via <strong>osascript</strong>, and parses the result.
+        </p>
+
+        <p>
+          Record separator <strong>0x1E</strong>, unit separator <strong>0x1F</strong> for output parsing &mdash; not a security boundary, just a way to avoid CSV hell.
+        </p>
+
+        <p>
+          Dates never use AppleScript's locale-sensitive <em>date &ldquo;Monday, April 21, 2026 at 10:00:00 AM&rdquo;</em> literal. I construct dates by adding epoch seconds to a fixed January 1, 1970 anchor, which Calendar.app parses the same on every locale.
+        </p>
+
+        <p>
+          Event IDs are Calendar.app's own <strong>uid</strong> property. Stable across app restarts, survives moving between calendars in the common path, and lets me round-trip events through Claude without inventing synthetic keys.
+        </p>
+
+        <h2>What I learned</h2>
+
+        <p>
+          <strong>AppleScript escaping is security work.</strong> Every string I pass &mdash; event title, notes, calendar name, URL &mdash; goes through one sanitizer that backslash-escapes <em>\</em> and <em>"</em> and wraps in quotes. Without it, a malicious event title could inject arbitrary AppleScript. I wrote the escape function first and a test for it second, before I wrote a single tool.
+        </p>
+
+        <p>
+          <strong>stdout is the transport.</strong> MCP speaks JSON-RPC on stdout. One errant <em>console.log</em> and the protocol breaks. Every log I write goes to <em>stderr</em>. This is a mistake I made once. I will not make it again.
+        </p>
+
+        <p>
+          <strong>Calendar.app is older than me.</strong> Accessing <em>location</em> or <em>description</em> on an event that doesn't have one throws. Setting a calendar by number works in some locales and not others. AppleScript is a language where half the bugs feel like folklore.
+        </p>
+
+        <p>
+          <strong>The worst bug was update_event.</strong> If you both rename an event <em>and</em> move it between calendars in the same call, Calendar.app helpfully saves the rename, then loses the reference before the move completes, and then quietly deletes the event with no trace. I found this by creating six calendar entries, trying to move them to the right calendar, and watching all six vanish. The fix: two separate operations, rename first, then move. The lesson: AppleScript errors lie, and the only trustworthy verification is a second read after the write.
+        </p>
+
+        <p>
+          <strong>Tests are the project's spine.</strong> I can't unit-test Calendar.app, but I <em>can</em> unit-test every string builder and every parser as a pure function, and I can slam adversarial payloads at the escape function. The tests are the reason I trust the server when it tells Claude it created an event.
+        </p>
+
+        <h2>What's next</h2>
+
+        <p>
+          Publish the repo under MIT.
+        </p>
+
+        <p>
+          Add Reminders.app support (Apple calls it <strong>Reminders</strong>, which is a separate AppleScript target).
+        </p>
+
+        <p>
+          Better recurring-event handling &mdash; right now I fetch the series and filter client-side, which is fine at my scale and painful at someone else's.
+        </p>
+
+        <p>
+          A small CLI so the server is useful even without an MCP client.
+        </p>
+
+        <h2>Thanks</h2>
+
+        <p>
+          To Claude, for being patient with my first twelve AppleScript injection attempts.
+        </p>
+
+        <p>
+          To Peter Steinberger for writing openclaw in the open &mdash; it's the template I keep copying from when I want to make a solo project feel professional.
+        </p>
+
+        <p>
+          To whoever at Apple kept AppleScript shipping for thirty-five years. I don't know your name, but I owe you.
+        </p>
+
+        <p>
+          More to come.
+        </p>
+
+        <div class="post-back">
+          <a href="../blog.html">&larr; Back to blog</a>
+        </div>
+
+      </div>
+
+    </article>
+
+    <footer class="site-footer">
+      You can find me on <a href="https://github.com/yongzhe-wang" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://www.linkedin.com/in/yongzhe-wang-andrew" target="_blank" rel="noopener">LinkedIn</a> &middot; Email: <a href="mailto:yongzhe@sas.upenn.edu">yongzhe@sas.upenn.edu</a>
+    </footer>
+
+  </main>
+</body>
+</html>

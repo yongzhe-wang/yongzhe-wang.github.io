@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../assets/favicon.png" sizes="256x256">
+  <link rel="icon" type="image/png" href="../assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../assets/favicon.png">
+  <title>thinkwork: when the AI is the assignment &mdash; Andrew Wang</title>
+  <meta name="description" content="Why I'm building thinkwork — an assessment platform where the AI is the assignment itself. The skill worth teaching now isn't arithmetic by hand; it's directing an AI and interpreting what comes back. Notes on the structure, the research, and the math pilot at Penn.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container">
+
+    <header class="site-header">
+      <a href="../index.html" class="site-title">Andrew Wang</a>
+      <nav class="site-nav">
+        <a href="../index.html">Home</a>
+        <a href="../how-i-think.html">How I Think</a>
+        <a href="../experience.html">Experience</a>
+        <a href="../blog.html" class="current">Blog</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </header>
+
+    <article>
+
+      <h1 class="page-title">thinkwork: when the AI is the assignment</h1>
+      <p class="post-subtitle">April 2026</p>
+      <ul class="link-bar">
+        <li><a href="https://github.com/yongzhe-wang/OpenfieldEducation" target="_blank" rel="noopener">GitHub repo</a></li>
+      </ul>
+
+      <div class="post-body">
+
+        <p>
+          ChatGPT made the answer free. Paste the prompt, get the answer. The answer was never the hard part of a problem set &mdash; it was the proxy we agreed to grade because getting it required the work we actually wanted. The work was the point. The answer was the receipt.
+        </p>
+
+        <p>
+          Homework held together as long as getting answers was hard. That friction is gone. What&rsquo;s left is a format that pretends nothing happened, a grader who can&rsquo;t tell, and a student who learns the lesson we actually taught: the answer is the thing, and the answer is a tab away.
+        </p>
+
+        <p>
+          The skill worth teaching now isn&rsquo;t grinding arithmetic by hand. It&rsquo;s directing an AI &mdash; knowing what to ask for, knowing what to check, knowing how to read what comes back. That&rsquo;s the job, for every quantitative discipline, for the rest of these students&rsquo; careers. So that&rsquo;s what I want to grade.
+        </p>
+
+        <h2>The bet</h2>
+
+        <p>
+          Banning AI doesn&rsquo;t work. Bolting guardrails onto existing assignments is Khanmigo&rsquo;s move &mdash; a Socratic chatbot sitting next to the same old problem set, hoping students talk to it before they paste the prompt somewhere else. Neither solves the actual problem, which is that the assignment itself no longer measures anything.
+        </p>
+
+        <p>
+          thinkwork&rsquo;s bet is simpler: make the AI <em>be</em> the assignment. There is no PDF. There is no problem set to share in a group chat. There is no file to screenshot. You finish a problem by having a conversation in which you supply the reasoning and the AI supplies the computation, and the conversation is the thing that gets graded. The assignment isn&rsquo;t something you do next to the AI &mdash; it is the AI, structured.
+        </p>
+
+        <h2>What the student actually does</h2>
+
+        <p>
+          The loop is: student directs, AI computes, student interprets. A farmer has 200 feet of fencing and wants the largest rectangular pen along a barn wall. The student opens the problem and says &ldquo;let x be the width perpendicular to the barn, y the length along it; the constraint is 2x + y = 200 because the barn is one side; maximize area A = xy.&rdquo; thinkwork asks why 2x + y and not 2x + 2y. The student explains the barn wall. thinkwork asks for the domain of x. The student works through the physical constraint &mdash; x is positive, y is positive, so 0 &lt; x &lt; 100. The student says &ldquo;substitute and take the derivative; I want dA/dx = 0.&rdquo; thinkwork does the algebra, renders it in LaTeX, returns a critical point. The student classifies it, reads the sign of the second derivative, interprets the geometry, and says why the maximum is there and not at an endpoint.
+        </p>
+
+        <p>
+          The student never multiplied anything out. thinkwork did. What the student did was choose variables, impose a constraint, name a method, read a result, and argue a conclusion. That&rsquo;s the exam. The arithmetic isn&rsquo;t. &ldquo;Compute 3(4)&sup2; &minus; 12(4) + 9&rdquo; is not a question I want to ask a human in 2026 &mdash; the AI does that. What I want to ask is: why that expression, why that method, and what the answer means.
+        </p>
+
+        <h2>The structure</h2>
+
+        <p>
+          An assignment is 4&ndash;8 <strong>problems</strong>, each with 2&ndash;5 <strong>steps</strong> &mdash; roughly 21 verification points. You clear every step to clear a problem; you clear every problem to clear the assignment. Sequential, no skipping. Thirty to sixty minutes of sustained reasoning, per assignment, per student. State lives server-side in a small state machine &mdash; problems unlock as you clear steps, and you cannot forge a pass from the client because the client isn&rsquo;t the one keeping score.
+        </p>
+
+        <h2>What I had to decide</h2>
+
+        <p>
+          <strong>Solution key as ground truth, not the LLM.</strong> The instructor&rsquo;s rubric lives server-side and never ships to the browser. The LLM is an evaluator against that rubric, not the authority. LLMs are impressionable &mdash; a student who sounds confident can talk one into agreeing. Rubrics aren&rsquo;t. Every evaluation is &ldquo;does this reasoning satisfy the rubric,&rdquo; not &ldquo;is the LLM impressed.&rdquo; That distinction is the reason grading with an LLM is defensible at all.
+        </p>
+
+        <p>
+          <strong>Trust the server, never the client.</strong> All state lives in the database. You cannot &ldquo;pass&rdquo; a problem from DevTools. You cannot see a step the server hasn&rsquo;t unlocked. You cannot replay a conversation the server never recorded. This sounds obvious and it is not how most ed-tech actually works &mdash; I&rsquo;ve seen grading flows where the client sends the score and the server writes it down.
+        </p>
+
+        <p>
+          <strong>Depth vs. throughput.</strong> Socratic probing can run forever; you can always ask one more &ldquo;but why.&rdquo; Real students have twenty things due. The rubric is the floor, not the ceiling &mdash; once a student clears it, probing stops. Past that point it isn&rsquo;t teaching, it&rsquo;s harassment.
+        </p>
+
+        <h2>Why it&rsquo;s not a tutor</h2>
+
+        <p>
+          A tutor helps you do the homework. thinkwork <em>replaces</em> the homework. The grade comes from the conversation, not from an answer submitted alongside one. You can paste in a correct-sounding claim and buy yourself one step. You cannot paste in a correct-sounding follow-up to a follow-up that thinkwork just generated in response to <em>your</em> words &mdash; because every student&rsquo;s conversation diverges on the first probing question, on the specific words they used. The Socratic structure isn&rsquo;t decoration. It&rsquo;s the integrity mechanism.
+        </p>
+
+        <p>
+          The clean way to see the market is a three-way split. Gradescope and WebAssign are <em>static</em> &mdash; PDFs and problem banks, copyable, screenshot-able, solvable by any model. Khanmigo is a <em>supplement</em> &mdash; a tutor sitting alongside an assignment that still exists on paper. thinkwork is the <em>assignment itself</em>. There is nothing to copy because there is no artifact, just a transcript that is different for every student.
+        </p>
+
+        <h2>What the research says</h2>
+
+        <p>
+          Bastani et al. (PNAS, 2025) ran a randomized trial with about a thousand students: unguarded ChatGPT made them 17% worse on exams. Students leaned on it as a crutch and never built the underlying skill. A Socratic-guardrailed version of the same tool eliminated the harm. Kestin et al. at Harvard (Scientific Reports, 2025) found AI tutoring outperformed in-class active learning &mdash; roughly twice the learning in less time. The OECD&rsquo;s 2026 Digital Education Outlook, Chapter 3, officially recommends the dialogue-based Socratic approach.
+        </p>
+
+        <p>
+          The research keeps pointing at the same seam: with the crutch available, students lean; with probing in the way, students learn. thinkwork&rsquo;s move is to not bolt guardrails onto a broken assignment format &mdash; it&rsquo;s to change the format so there&rsquo;s no crutch to lean on in the first place.
+        </p>
+
+        <h2>The pilot</h2>
+
+        <p>
+          We&rsquo;re running in undergraduate math at Penn this spring &mdash; Calculus, Linear Algebra, Multivariable Calculus. Math first because the problem structure is easiest to see: the reasoning step is distinct from the computation step, so you can grade one and let the AI handle the other. The platform generalizes to any discipline with a verifiable rubric; statistics, physics, and finance are next.
+        </p>
+
+        <p>
+          FERPA-aligned. Penn SSO for auth. Bounded retention &mdash; course plus one semester, then the data is gone. The pilot goal isn&rsquo;t an A/B test against ChatGPT; students will use ChatGPT anyway, and I don&rsquo;t want to pretend otherwise. The goal is whether this cohort walks out understanding more than last year&rsquo;s did.
+        </p>
+
+        <h2>What I keep coming back to</h2>
+
+        <p>
+          ChatGPT didn&rsquo;t ruin homework. It exposed what homework always was &mdash; a weak proxy for understanding, held together by the friction of getting answers. The question isn&rsquo;t how to put friction back. It&rsquo;s what we actually want to measure. If understanding is the thing, measure the thing, not its shadow. And if the skill worth teaching today is directing an AI well and interpreting what comes back &mdash; because that&rsquo;s the job, for every quantitative discipline, for the rest of these students&rsquo; careers &mdash; then teach that. thinkwork is one answer to that.
+        </p>
+
+        <p>
+          <em>Answers are free. Understanding isn&rsquo;t.</em>
+        </p>
+
+        <div class="post-back">
+          <a href="../blog.html">&larr; Back to blog</a>
+        </div>
+
+      </div>
+
+    </article>
+
+    <footer class="site-footer">
+      You can find me on <a href="https://github.com/yongzhe-wang" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://www.linkedin.com/in/yongzhe-wang-andrew" target="_blank" rel="noopener">LinkedIn</a> &middot; Email: <a href="mailto:yongzhe@sas.upenn.edu">yongzhe@sas.upenn.edu</a>
+    </footer>
+
+  </main>
+</body>
+</html>
