@@ -1,0 +1,111 @@
+CLAUDE INSTRUCTIONS — Andrew Wang personal site
+===============================================
+
+These are the standing rules for how this site is maintained. They supersede
+any generic defaults. Everything on this site must read as PROFESSIONAL —
+no casual framing, no "startup" vocabulary.
+
+
+IDENTITY
+--------
+- Display name everywhere: "Andrew Wang".
+- Never say "Yongzhe" in display text. The name "Yongzhe" is allowed ONLY
+  inside the email address (yongzhe@sas.upenn.edu) and inside URLs
+  (github.com/yongzhe-wang, linkedin.com/in/yongzhe-wang-andrew).
+- Do NOT name other people anywhere on the site. No advisors, no
+  collaborators, no teammates, no professors. Reword any surrounding copy
+  to flow naturally without the names.
+
+
+TONE
+----
+- Professional. Quiet confidence. No hype vocabulary.
+- NEVER use the word "startup" as a descriptor. Say "company" or rephrase
+  to avoid the concept entirely. A humanoid robotics company, not a
+  humanoid robotics startup.
+- End sentences with "." — not "!". Exclamation marks are off-limits.
+- Keep the Physical Intelligence (π) aesthetic: understated, monospace
+  body, serif-italic headings, warm cream background, left-aligned.
+- Do not say "Google" as an employer anywhere. The word "google" inside
+  the fonts.googleapis.com URL is fine; nothing else.
+- Do not mention GPAs.
+
+
+DESIGN SYSTEM
+-------------
+- Background: #F5F4EF (warm cream).
+- Primary text: #000000. Muted text: #686868. Border warm dark: #403E37.
+- Body font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace.
+- Heading font: "Source Serif 4" italic (Google Fonts), with
+  letter-spacing: -0.02em.
+- Nav font: "Source Sans 3" (Google Fonts).
+- Max content width: 680px, centered, left-aligned text.
+- Timeline dots: 7x7 black rounded-square markers at left: -40px.
+- Hover on timeline items: soft warm border + 3px,3px offset shadow.
+- Signature hard-edge offset shadow on cards: "3px 3px 0 #000" baseline,
+  growing on hover.
+
+
+NAVIGATION
+----------
+Fixed top nav, six tabs in this exact order:
+  Home · How I Think · Research · Experience · Blog · About
+The current page's link gets class="current" (underline offset 8px).
+
+
+TAGLINE (Home)
+--------------
+"Teaching machines to understand the world — and to act within it."
+Italic serif, muted color, displayed directly under the bio paragraph.
+
+
+FAVICON + PORTRAIT
+------------------
+- Browser icon: assets/favicon.png (sourced from meme/喜哥.png).
+- Portrait photo on Home + About: assets/portrait.jpeg
+  (from meme/black_me.jpeg). Rounded 8px corners, soft offset shadow.
+
+
+REPO / DEPLOY
+-------------
+- Main worktree: /Users/thebigsun/Desktop/yongzhe-wang.github.io/
+- Claude worktree: same path, /.claude/worktrees/serene-nightingale-3411e4/
+  (do not touch unless explicitly told).
+- GitHub repo: yongzhe-wang/yongzhe-wang.github.io
+- Live URL: https://yongzhe-wang.github.io/
+- GitHub Pages serves from branch `main`. After merging to main, push and
+  wait for pages build to finish, then verify live.
+- Never force-push. Never git add -A. Stage files explicitly by name.
+- For destructive moves, prefer git mv (preserves history) over rm+create.
+
+
+SUBAGENT DELEGATION (for orchestrator sessions)
+-----------------------------------------------
+- Orchestrator (main Claude) must not directly Edit/Write code files.
+  Delegate all code edits to subagents.
+- All subagents run with model: "opus".
+- Run independent agents in parallel (single message, multiple tool calls).
+- After every implementation, spawn 4 review agents in parallel:
+  logic review, edge cases, tests, safety/OWASP.
+
+
+NAMING RULES (SUBSTRING BLOCK LIST)
+-----------------------------------
+Forbidden in any display text (HTML body, titles, meta descriptions):
+  Jiatao  Shiying  Moosm  Tina  Mike  Ayan  Sepna  Susan
+  Andy Wang  Winson  Hugo Song
+  Google (as employer)   GPA   startup
+
+Allowed only in URLs or email addresses:
+  yongzhe-wang (GitHub handle)   yongzhe-wang-andrew (LinkedIn handle)
+  yongzhe@sas.upenn.edu (email)
+
+
+COMMIT DISCIPLINE
+-----------------
+- One-line summary (<=72 chars), blank line, body paragraphs.
+- Co-Authored-By trailer for Claude commits:
+    Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+- Use HEREDOC for commit messages so newlines are preserved.
+- Commit specific files, never all. Never commit .env / credentials /
+  build artifacts / xcuserdata / DerivedData / .DS_Store.
