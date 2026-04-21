@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Yongzhe (Andrew) Wang — personal site
+   Andrew Wang — personal site
    Visual language: Physical Intelligence (π).
    Warm cream background, monospace body, Source Serif 4 italic headings.
    ========================================================================== */
@@ -223,6 +223,37 @@ em     { font-style: italic; }
   flex-direction: column;
   min-width: 0;
   flex: 1;
+}
+
+.experience-logo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-self: flex-start;
+  margin-top: 1px;
+  border: 1px solid #D4D3CB;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--muted-foreground);
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.experience-logo img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .timeline-title {
