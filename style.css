@@ -246,34 +246,44 @@ em     { font-style: italic; }
 .experience-logo,
 .timeline-logo {
   position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  align-self: flex-start;
+  margin-top: -2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  overflow: hidden;
+}
+
+.timeline-logo-default {
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  align-self: flex-start;
-  margin-top: 1px;
-  border: 1px solid #D4D3CB;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.58);
   color: var(--muted-foreground);
-  overflow: hidden;
   font-family: var(--font-sans);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   line-height: 1;
   font-weight: 600;
 }
 
 .experience-logo img,
 .timeline-logo img {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
   width: 100%;
   height: 100%;
-  padding: 6px;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.86);
+  display: block;
+  background: transparent;
+}
+
+.timeline-logo-default img {
+  grid-area: 1 / 1;
+}
+
+.timeline-logo-default span {
+  grid-area: 1 / 1;
 }
 
 .timeline-title {
