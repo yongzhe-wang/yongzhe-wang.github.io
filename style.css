@@ -187,6 +187,16 @@ em     { font-style: italic; }
   margin-bottom: 0;
 }
 
+.page-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: var(--muted-foreground);
+  margin-top: -24px;   /* pull tighter under page-intro since page-intro already has bottom margin */
+  margin-bottom: 48px;
+}
+
 .home-photo {
   width: 132px;
   height: 132px;
