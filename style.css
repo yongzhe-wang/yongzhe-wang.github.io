@@ -1,96 +1,580 @@
+/* ==========================================================================
+   Yongzhe (Andrew) Wang — personal site
+   Design language inspired by Physical Intelligence (π).
+   Pure CSS, system fonts only.
+   ========================================================================== */
+
+:root {
+  --bg: #FAFAF7;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --border: #D4D3CB;
+  --border-hover: #C0BDAD;
+  --shadow: #000000;
+
+  --serif: "Tiempos Text", "Charter", "Iowan Old Style", Georgia, serif;
+  --sans: "Figtree", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Reset
+   -------------------------------------------------------------------------- */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-    font-family: Arial, Arial, Helvetica, sans-serif;
-    color: #333;
-    background-color: #f4f4f4;
-    font-size: 15px;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Typography
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 28px;
+  margin-top: 56px;
+  margin-bottom: 24px;
+}
+
+h3 {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-bottom: 4px;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+a:hover {
+  border-bottom-color: var(--text);
+}
+
+strong {
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+}
+
+/* Nav
+   -------------------------------------------------------------------------- */
+.nav {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.nav-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.nav-brand {
+  font-family: var(--serif);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+}
+
+.nav-brand:hover {
+  border-bottom: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.nav-links a.active {
+  color: var(--text);
+}
+
+/* Container
+   -------------------------------------------------------------------------- */
 .container {
-    display: flex;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    min-height: 100vh;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 72px 24px 96px;
 }
 
-.sidebar {
-    flex: 1;
-    padding: 10px;
-    border-right: 1px solid #ddd;
-    width: 200px; /* Adjust the width as needed */
-    min-width: 200px; 
-    max-width: 200px;
-    overflow: hidden;
-    background-color: #f4f4f4;
-    margin: 0px 0px 0px 10px;
+/* Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  margin-bottom: 40px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
 }
 
-    .sidebar ul {
-        list-style: none;
-        padding: 0;
-        margin: 0px 10px 0px 0px;
-    }
-
-        .sidebar ul li a {
-            text-decoration: none;
-            color: black;
-            display: block;
-            padding: 10px;
-        }
-
-            .sidebar ul li a:hover {
-                background-color: #34a853;
-                color: #ffffff;
-                transition: background-color 1s ease;
-            }
-
-.highlight {
-    font-size: 1.4em;
-    border-radius: 5px;
-    width: 300px;
-    padding: 13px;
+.hero h1 {
+  font-size: 56px;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
 }
 
-.content {
-    flex-grow: 1; /* Takes up the remaining space */
-    padding: 20px 20px 20px 20px;
-    max-width: 700px; /* Limits the width on larger screens */
-    min-width: 400px;
-    overflow-x: hidden; /* Prevents horizontal overflow */
-    margin: 5px 5px 5px 5px;
+.tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+  margin-bottom: 0;
 }
 
-section {
-    margin-bottom: 20px;
+.bio {
+  margin-top: 32px;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--text);
 }
 
-
-
-
-.line_style {
-    margin: 10px auto 30px auto
+/* Hero portrait (Home)
+   -------------------------------------------------------------------------- */
+.hero-portrait {
+  flex-shrink: 0;
+  width: 200px;
+  height: 240px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0px var(--shadow);
+  overflow: hidden;
+  transition: all 0.15s ease;
+  background: var(--card);
 }
 
+.hero-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(10%) contrast(1.02);
+}
+
+.hero-portrait:hover {
+  box-shadow: 6px 6px 0px var(--shadow);
+  transform: translate(-1px, -1px);
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* About portrait
+   -------------------------------------------------------------------------- */
+.about-portrait {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px var(--shadow);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: all 0.15s ease;
+  background: var(--card);
+}
+
+.about-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(10%) contrast(1.02);
+}
+
+.about-portrait:hover {
+  box-shadow: 5px 5px 0px var(--shadow);
+  transform: translate(-1px, -1px);
+}
+
+/* About hero needs column stacking (portrait above heading) */
+.hero:has(.about-portrait) {
+  display: block;
+}
+
+/* Section heading (smaller than hero)
+   -------------------------------------------------------------------------- */
+.section-heading {
+  font-family: var(--serif);
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  margin-top: 64px;
+  margin-bottom: 28px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-intro {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 640px;
+}
+
+/* Timeline
+   -------------------------------------------------------------------------- */
+.timeline {
+  position: relative;
+  margin-left: 40px;
+  padding-left: 24px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  padding: 10px 0 22px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: 18px;
+  width: 7px;
+  height: 7px;
+  background: #000;
+  outline: 2px solid var(--bg);
+}
+
+.timeline-date {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0;
+  margin-bottom: 4px;
+}
+
+.timeline-title a {
+  border-bottom: 1px solid transparent;
+}
+
+.timeline-title a:hover {
+  border-bottom-color: var(--text);
+}
+
+.timeline-desc {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+/* Card (offset shadow)
+   -------------------------------------------------------------------------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 3px 3px 0px var(--shadow);
+  padding: 24px 28px;
+  transition: all 0.15s ease;
+  margin-bottom: 24px;
+}
+
+.card:hover {
+  box-shadow: 5px 5px 0px var(--shadow);
+  transform: translate(-1px, -1px);
+  border-color: var(--border-hover);
+}
+
+.card h3 {
+  font-family: var(--serif);
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.card-list {
+  list-style: none;
+}
+
+.card-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text);
+}
+
+.card-list li:last-child {
+  border-bottom: none;
+}
+
+.card-list li .muted {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* Link bar (inline, slash-separated)
+   -------------------------------------------------------------------------- */
 .link-bar {
-    padding:12px;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    color: #0000FF; /* Sets the text color to blue */
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  font-size: 15px;
+  margin: 8px 0 24px;
 }
 
-.link {
-    color: #34a853; /* Ensures the links are blue */
-    text-decoration: none; /* Removes underline from links */
+.link-bar li {
+  display: inline-flex;
+  align-items: center;
 }
 
-    .link:hover {
-        text-decoration: underline; /* Adds underline on hover for better interactivity */
-    }
+.link-bar li + li::before {
+  content: "/";
+  color: var(--muted);
+  margin: 0 12px;
+}
+
+.link-bar a {
+  border-bottom: 1px solid transparent;
+}
+
+.link-bar a:hover {
+  border-bottom-color: var(--text);
+}
+
+/* Info list (key: value rows, used on About)
+   -------------------------------------------------------------------------- */
+.info-list {
+  list-style: none;
+  margin-bottom: 8px;
+}
+
+.info-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.info-list li:last-child {
+  border-bottom: none;
+}
+
+.info-list .label {
+  color: var(--muted);
+  display: inline-block;
+  min-width: 90px;
+  font-size: 13.5px;
+}
+
+/* Footer
+   -------------------------------------------------------------------------- */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  margin-top: 48px;
+}
+
+.footer-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.footer a {
+  color: var(--muted);
+}
+
+.footer a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.footer-links {
+  display: flex;
+  gap: 18px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+/* Blog post typography
+   -------------------------------------------------------------------------- */
+.post-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+
+.post-body {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.post-body p {
+  margin-bottom: 20px;
+}
+
+.post-body h2 {
+  font-size: 22px;
+  margin-top: 40px;
+  margin-bottom: 14px;
+}
+
+.post-body a {
+  border-bottom: 1px solid var(--muted);
+}
+
+.post-body a:hover {
+  border-bottom-color: var(--text);
+}
+
+.post-back {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  body {
+    font-size: 15.5px;
+  }
+
+  .nav-inner {
+    padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .nav-links {
+    gap: 16px;
+    width: 100%;
+  }
+
+  .container {
+    padding: 48px 20px 72px;
+  }
+
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .hero-portrait {
+    width: 160px;
+    height: 192px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  .tagline {
+    font-size: 18px;
+  }
+
+  .section-heading {
+    font-size: 20px;
+    margin-top: 48px;
+  }
+
+  .timeline {
+    margin-left: 16px;
+    padding-left: 20px;
+  }
+
+  .timeline-item::before {
+    left: -23px;
+  }
+
+  .footer {
+    padding: 24px 20px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
