@@ -298,6 +298,7 @@ em     { font-style: italic; }
 .timeline-logo-emoji span {
   /* reset inherited monospace so emoji renders via system emoji font */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  color: initial;
 }
 
 .timeline-title {
