@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../assets/favicon.png" sizes="256x256">
+  <link rel="icon" type="image/png" href="../assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../assets/favicon.png">
+  <title>HAUNTED &mdash; a calendar haunted by people who know you &mdash; Andrew Wang</title>
+  <meta name="description" content="HAUNTED is an MCP server for macOS Calendar.app with relational characters — Mom, Friend, your future self — who comment on every event using your past calendar history.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container">
+
+    <header class="site-header">
+      <a href="../index.html" class="site-title">Andrew Wang</a>
+      <nav class="site-nav">
+        <a href="../index.html">Home</a>
+        <a href="../how-i-think.html">How I Think</a>
+        <a href="../experience.html">Experience</a>
+        <a href="../blog.html" class="current">Blog</a>
+        <a href="../about.html">About</a>
+      </nav>
+    </header>
+
+    <article>
+
+      <h1 class="page-title">HAUNTED &mdash; a calendar haunted by people who know you</h1>
+      <p class="post-subtitle">May 2026</p>
+      <ul class="link-bar">
+        <li><a href="https://github.com/yongzhe-wang/haunted-mcp" target="_blank" rel="noopener">GitHub repo</a></li>
+        <li><a href="https://www.npmjs.com/package/haunted-mcp" target="_blank" rel="noopener">npm</a></li>
+      </ul>
+
+      <div class="post-body">
+
+        <p>
+          <img src="../assets/haunted-hero.png" alt="HAUNTED character memory week view" style="width:100%;height:auto;border-radius:8px;margin:1rem 0;">
+        </p>
+
+        <p>
+          A calendar haunted by people who know you. HAUNTED is an MCP server for macOS Calendar.app. It gives Claude full read/write access to your Apple Calendar &mdash; plus relational characters (Mom, Friend, your future self) who comment on every event with one-liners that reference your past calendar history. 15 tools, persistent memory, fully reversible.
+        </p>
+
+        <h2>What it does</h2>
+
+        <p>
+          The original <a href="2026-04-apple-calendar-mcp.html">apple-calendar-mcp</a> shipped with six tools and one job: let Claude put events on the calendar. HAUNTED keeps that core and layers a second system on top &mdash; relational personas with persistent memory who watch what you schedule and react to it.
+        </p>
+
+        <p>
+          Add a 6 a.m. flight back to Philly and Mom remembers the last three times you didn't call after landing. Schedule a third coffee with the same person this week and Future You has something to say about it. The characters are configurable, the memory is local, and every action is reversible.
+        </p>
+
+        <h2>Why</h2>
+
+        <p>
+          Calendars are flat. They tell you <em>what</em> but they don't tell you <em>who's affected</em>, <em>what's been said before</em>, or <em>what your past self would think of this</em>. I wanted a tool that kept the data discipline of an MCP server but added the texture of having people in your life who pay attention.
+        </p>
+
+        <p>
+          The personas don't generate plans. They don't optimize. They just <em>notice</em>. That turned out to be more useful than any of the optimization I was trying to bolt on.
+        </p>
+
+        <h2>How it's built</h2>
+
+        <p>
+          HAUNTED inherits the AppleScript injection-safe pipeline from apple-calendar-mcp &mdash; every untrusted string passes through a single <em>escapeAppleScriptString</em>, dates are constructed from epoch seconds, and stdout belongs to the MCP protocol while logs go to stderr.
+        </p>
+
+        <p>
+          The new layer is character memory: a small persistence file per character, with structured recollection of past events the character has seen, plus a reaction tool that synthesizes a comment using both the new event and the relevant history.
+        </p>
+
+        <p>
+          15 tools total. The calendar primitives (<em>list_calendars</em>, <em>list_events</em>, <em>search_events</em>, <em>create_event</em>, <em>update_event</em>, <em>delete_event</em>) plus character management (create / update / list / delete) plus the reaction tools that tie events to memory.
+        </p>
+
+        <h2>What's next</h2>
+
+        <p>
+          More personas. Better memory consolidation. A way to surface the comments without having to ask for them.
+        </p>
+
+        <ul class="link-bar">
+          <li><a href="https://github.com/yongzhe-wang/haunted-mcp" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/haunted-mcp" target="_blank" rel="noopener">npm</a></li>
+        </ul>
+
+        <div class="post-back">
+          <a href="../blog.html">&larr; Back to blog</a>
+        </div>
+
+      </div>
+
+    </article>
+
+    <footer class="site-footer">
+      You can find me on <a href="https://github.com/yongzhe-wang" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://www.linkedin.com/in/yongzhe-wang-andrew" target="_blank" rel="noopener">LinkedIn</a> &middot; Email: <a href="mailto:yongzhe@sas.upenn.edu">yongzhe@sas.upenn.edu</a>
+    </footer>
+
+  </main>
+</body>
+</html>
