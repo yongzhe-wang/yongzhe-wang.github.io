@@ -6,8 +6,8 @@
   <link rel="icon" type="image/png" href="../assets/favicon.png" sizes="256x256">
   <link rel="icon" type="image/png" href="../assets/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="../assets/favicon.png">
-  <title>HAUNTED &mdash; a calendar haunted by people who know you &mdash; Andrew Wang</title>
-  <meta name="description" content="HAUNTED is an MCP server for macOS Calendar.app with relational characters — Mom, Friend, your future self — who comment on every event using your past calendar history.">
+  <title>YAPPING &mdash; your calendar, but yapping &mdash; Andrew Wang</title>
+  <meta name="description" content="YAPPING is an MCP server for macOS Calendar.app with 28 voices — Mom, Future-you, Garry Tan, LeBron James, Hilary Hahn, Alan Turing, Confucius — who yap on every event using your past calendar history.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
@@ -29,31 +29,31 @@
 
     <article>
 
-      <h1 class="page-title">HAUNTED &mdash; a calendar haunted by people who know you</h1>
+      <h1 class="page-title">YAPPING &mdash; your calendar, but yapping</h1>
       <p class="post-subtitle">May 2026</p>
       <ul class="link-bar">
-        <li><a href="https://github.com/yongzhe-wang/haunted-apple-calendar-mcp" target="_blank" rel="noopener">GitHub repo</a></li>
-        <li><a href="https://www.npmjs.com/package/haunted-apple-calendar-mcp" target="_blank" rel="noopener">npm</a></li>
+        <li><a href="https://github.com/yongzhe-wang/yapping-apple-calendar-mcp" target="_blank" rel="noopener">GitHub repo</a></li>
+        <li><a href="https://www.npmjs.com/package/yapping-apple-calendar-mcp" target="_blank" rel="noopener">npm</a></li>
       </ul>
 
       <div class="post-body">
 
         <p>
-          <img src="../assets/haunted-hero.png" alt="HAUNTED — sample event cards from the author's actual Apple Calendar (Mom, Garry Tan, Future-you, Alan Turing)" style="width:100%;height:auto;border-radius:8px;margin:1rem 0;">
+          <img src="../assets/yapping-hero.png" alt="YAPPING — sample event cards from the author's actual Apple Calendar (Mom, Garry Tan, Future-you, Alan Turing)" style="width:100%;height:auto;border-radius:8px;margin:1rem 0;">
         </p>
 
         <p>
-          A calendar haunted by people who know you. HAUNTED is an MCP server for macOS Calendar.app. It gives Claude full read/write access to your Apple Calendar &mdash; plus relational characters (Mom, Friend, your future self) who comment on every event with one-liners that reference your past calendar history. 22 tools, persistent memory, fully reversible.
+          Your calendar, but yapping. YAPPING is an MCP server for macOS Calendar.app. It gives Claude full read/write access to your Apple Calendar &mdash; plus 28 voices (Mom, Future-you, Garry Tan, LeBron James, Hilary Hahn, Alan Turing, Confucius, ...) who yap on every event with one-liners that reference your past calendar history. 22 tools, 12 characters, 16 distillers, persistent memory, fully reversible.
         </p>
 
         <h2>What it does</h2>
 
         <p>
-          The original <a href="2026-04-apple-calendar-mcp.html">apple-calendar-mcp</a> shipped with six tools and one job: let Claude put events on the calendar. HAUNTED keeps that core and layers a second system on top &mdash; relational personas with persistent memory who watch what you schedule and react to it.
+          The original <a href="2026-04-apple-calendar-mcp.html">apple-calendar-mcp</a> shipped with six tools and one job: let Claude put events on the calendar. YAPPING keeps that core and layers a second system on top &mdash; 28 voices with persistent memory who watch what you schedule and yap about it.
         </p>
 
         <p>
-          Add a 6 a.m. flight back to Philly and Mom remembers the last three times you didn't call after landing. Schedule a third coffee with the same person this week and Future You has something to say about it. The characters are configurable, the memory is local, and every action is reversible.
+          Add a 6 a.m. flight back to Philly and Mom remembers the last three times you didn't call after landing. Schedule a third coffee with the same person this week and Future-you has something to say about it. The voices are configurable, the memory is local, and every action is reversible.
         </p>
 
         <h2>Why</h2>
@@ -63,13 +63,13 @@
         </p>
 
         <p>
-          The personas don't generate plans. They don't optimize. They just <em>notice</em>. That turned out to be more useful than any of the optimization I was trying to bolt on.
+          The voices don't generate plans. They don't optimize. They just <em>yap</em>. That turned out to be more useful than any of the optimization I was trying to bolt on.
         </p>
 
         <h2>How it's built</h2>
 
         <p>
-          HAUNTED inherits the AppleScript injection-safe pipeline from apple-calendar-mcp &mdash; every untrusted string passes through a single <em>escapeAppleScriptString</em>, dates are constructed from epoch seconds, and stdout belongs to the MCP protocol while logs go to stderr.
+          YAPPING inherits the AppleScript injection-safe pipeline from apple-calendar-mcp &mdash; every untrusted string passes through a single <em>escapeAppleScriptString</em>, dates are constructed from epoch seconds, and stdout belongs to the MCP protocol while logs go to stderr.
         </p>
 
         <p>
@@ -77,18 +77,18 @@
         </p>
 
         <p>
-          22 tools total. The calendar primitives (<em>list_calendars</em>, <em>list_events</em>, <em>search_events</em>, <em>create_event</em>, <em>update_event</em>, <em>delete_event</em>) plus character management (create / update / list / delete), the reaction tools that tie events to memory, the mortality overlay, and the distiller pipeline that turns past events into structured memory.
+          22 tools total. The calendar primitives (<em>list_calendars</em>, <em>list_events</em>, <em>search_events</em>, <em>create_event</em>, <em>update_event</em>, <em>delete_event</em>) plus character management (create / update / list / delete) across 12 characters, the reaction tools that tie events to memory, the mortality overlay, and 16 distillers that turn past events into structured memory &mdash; 28 voices in all.
         </p>
 
         <h2>What's next</h2>
 
         <p>
-          More personas. Better memory consolidation. A way to surface the comments without having to ask for them.
+          More voices. Better memory consolidation. A way to surface the yapping without having to ask for it.
         </p>
 
         <ul class="link-bar">
-          <li><a href="https://github.com/yongzhe-wang/haunted-apple-calendar-mcp" target="_blank" rel="noopener">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/haunted-apple-calendar-mcp" target="_blank" rel="noopener">npm</a></li>
+          <li><a href="https://github.com/yongzhe-wang/yapping-apple-calendar-mcp" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/yapping-apple-calendar-mcp" target="_blank" rel="noopener">npm</a></li>
         </ul>
 
         <div class="post-back">
