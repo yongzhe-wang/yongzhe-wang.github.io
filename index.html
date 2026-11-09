@@ -12,34 +12,134 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    body.home-b { background: #fff; color: #111; margin: 0; font-family: "Source Sans 3", sans-serif; }
-    .hb-wrap { max-width: 960px; margin: 0 auto; padding: 72px 32px; }
-    .hb-nav { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; margin-bottom: 96px; }
-    .hb-nav a { color: #666; text-decoration: none; margin-left: 22px; }
-    .hb-nav .hb-name { color: #111; font-weight: 600; margin-left: 0; }
-    .hb-nav a:hover { color: #111; }
-    .hb-title { font-family: "Source Serif 4", serif; font-weight: 400; font-size: 56px; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 24px; max-width: 780px; }
-    .hb-lead { font-size: 19px; color: #555; max-width: 640px; line-height: 1.6; margin: 0; }
-    .hb-foot { margin-top: 64px; color: #777; font-size: 14px; }
-    .hb-foot a { color: #777; }
-    @media (max-width: 640px) { .hb-wrap { padding: 40px 16px; } .hb-nav { margin-bottom: 56px; } .hb-title { font-size: 38px; } }
-  </style>
 </head>
-<body class="home-b">
-  <main class="hb-wrap">
-    <nav class="hb-nav">
-      <a href="index.html" class="hb-name">Andrew Wang</a>
-      <span><a href="experience.html">Experience</a><a href="blog.html">Blog</a><a href="about.html">About</a></span>
-    </nav>
+<body>
+  <main class="container">
 
-    <h1 class="hb-title">I'm building the cloud that robots think on.</h1>
+    <header class="site-header">
+      <a href="index.html" class="site-title">Andrew Wang</a>
+      <nav class="site-nav">
+        <a href="index.html" class="current">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </header>
 
-    <p class="hb-lead">I'm Andrew Wang, a current senior at the University of Pennsylvania studying Computer Science as an undergraduate and Robotics + Computer Vision as a master's student. I build AI systems that reason, perceive, and act.</p>
+    <section class="home-intro" aria-label="Intro">
+      <div>
+        <p class="home-lead">
+          I'm Andrew Wang, a current senior at the University of Pennsylvania studying Computer Science as an undergraduate and Robotics + Computer Vision as a master's student. I build AI systems that reason, perceive, and act.
+        </p>
 
-    <footer class="hb-foot">
-      <a href="https://github.com/yongzhe-wang" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://www.linkedin.com/in/yongzhe-wang-andrew" target="_blank" rel="noopener">LinkedIn</a> &middot; <a href="mailto:yongzhe@sas.upenn.edu">yongzhe@sas.upenn.edu</a>
+        <p class="home-tagline">
+          Teaching machines to understand the world, and to act within it.
+        </p>
+      </div>
+
+      <img class="home-photo" src="assets/portrait.jpeg" alt="Andrew Wang">
+    </section>
+
+    <div class="timeline">
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/viam_logo.png" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">&#129353; Third place, Viam &times; MongoDB Robot Hackathon.</h3>
+          <p class="timeline-desc">Built Trick-or-Treat Sorter: type any list of objects and a UFactory xArm6 finds each one on a cluttered table and drops it into a movable bucket. Open-vocabulary CLIP with MongoDB Atlas vector search, nothing trained for the objects. <a href="https://github.com/yongzhe-wang/viam-atlas-sorter" target="_blank" rel="noopener">GitHub</a></p>
+        </div>
+        <span class="timeline-date">October 2026</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/general_sequences_logo.png" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Founder, <a href="https://generalsequences.com" target="_blank" rel="noopener">General Sequences</a></h3>
+          <p class="timeline-desc">Cloud inference for robots. Teams deploy their own policies and benchmarks as endpoints on our GPUs.</p>
+        </div>
+        <span class="timeline-date">August 2026</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/noematrix_saved.jpeg" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Member of Technical Staff (World Models), Noematrix</h3>
+          <p class="timeline-desc">Worked on foundational world-model pre-training for humanoid robots.</p>
+        </div>
+        <span class="timeline-date">April 2026</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/anthropic_logo.png" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title"><a href="blog/2026-04-vertices-hackathon.html">&#129351; Vertices won the Anthropic &times; Penn AI Hackathon.</a></h3>
+          <p class="timeline-desc">Built <a href="blog/2026-04-vertices-hackathon.html">Vertices</a>, an AI broker for people that matches users by what they're actually working on.</p>
+        </div>
+        <span class="timeline-date">April 2026</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/focusalpha_logo.jpeg" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">FocusAlpha AI, Columbia AI Competition finalist.</h3>
+          <p class="timeline-desc">Presented our vision for AI-driven investment research at Columbia Business School. <a href="https://lnkd.in/egAZnaFM" target="_blank" rel="noopener">More info</a></p>
+        </div>
+        <span class="timeline-date">March 2026</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/pennengai_logo.jpeg" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">VLA + World Model Research, Penn GMLR Lab</h3>
+          <p class="timeline-desc">Exploring VLA and world-model research for dexterous manipulation at Penn's GMLR Lab.</p>
+        </div>
+        <span class="timeline-date">May 2025</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo" aria-hidden="true">
+          <img src="assets/focusalpha_logo.jpeg" alt="" loading="lazy">
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Founding Engineer, FocusAlpha AI</h3>
+          <p class="timeline-subtitle">Early-stage team of under ten. One of two AI agent engineers on the core platform.</p>
+          <ul class="timeline-desc-list">
+            <li>Architected the backend for automated ingestion of SEC filings, earnings transcripts, and financial statements.</li>
+            <li>Built AI agents that synthesize qualitative and quantitative signals into structured investment reports.</li>
+          </ul>
+        </div>
+        <span class="timeline-date">May 2025</span>
+      </div>
+
+      <div class="timeline-item">
+        <span class="timeline-logo timeline-logo-default" aria-hidden="true">
+          <span>UNC</span>
+        </span>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Paper: <a href="https://arxiv.org/abs/2307.05705" target="_blank" rel="noopener">Measure transfer via stochastic slicing and matching</a></h3>
+          <p class="timeline-desc">Worked on stochastic slicing-and-matching schemes for measure transfer. <a href="https://arxiv.org/abs/2307.05705" target="_blank" rel="noopener">arXiv</a></p>
+        </div>
+        <span class="timeline-date">July 2023</span>
+      </div>
+
+    </div>
+
+    <footer class="site-footer">
+      You can find me on <a href="https://github.com/yongzhe-wang" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://www.linkedin.com/in/yongzhe-wang-andrew" target="_blank" rel="noopener">LinkedIn</a> &middot; Email: <a href="mailto:yongzhe@sas.upenn.edu">yongzhe@sas.upenn.edu</a>
     </footer>
+
   </main>
 </body>
 </html>

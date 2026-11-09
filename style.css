@@ -170,10 +170,6 @@ em     { font-style: italic; }
   margin-bottom: 48px;
 }
 
-.home-intro:not(:has(.home-photo)) {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .home-lead {
   font-family: var(--font-mono);
   font-size: 1rem;
