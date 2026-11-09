@@ -1,20 +1,22 @@
 /* ==========================================================================
    Andrew Wang — personal site
-   Visual language: Physical Intelligence (π).
-   Warm cream background, monospace body, Source Serif 4 italic headings.
+   Visual language: Physical Intelligence (π) research pages.
+   White background, Inter body, upright Source Serif 4 headings.
    ========================================================================== */
 
 :root {
-  --background: #F5F4EF;
-  --background-hover: #EBEAE5;
+  --background: #FFFFFF;
+  --background-hover: #F6F6F3;
   --foreground: #000000;
-  --muted: #E5E4DC;
-  --muted-foreground: #686868;
+  --muted: #F0EFEA;
+  --muted-foreground: #6B6B6B;
   --border: #403E37;
 
   --font-serif: "Source Serif 4", "Iowan Old Style", "Charter", Georgia, serif;
-  --font-sans: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* body text: was monospace, now Inter like the research post; code keeps a monospace face (--font-code) */
+  --font-mono: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* Reset
@@ -36,7 +38,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-mono);
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -111,10 +113,11 @@ em     { font-style: italic; }
 }
 
 .site-title {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.5rem;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 0.9375rem;
   line-height: 2rem;
+  color: var(--muted-foreground);
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
@@ -132,11 +135,16 @@ em     { font-style: italic; }
 }
 
 .site-nav a {
-  color: var(--foreground);
+  color: var(--muted-foreground);
   font-weight: 400;
 }
 
+.site-nav a:hover {
+  color: var(--foreground);
+}
+
 .site-nav a.current {
+  color: var(--foreground);
   text-decoration: underline;
   text-underline-offset: 8px;
   text-decoration-thickness: 1px;
@@ -154,9 +162,9 @@ em     { font-style: italic; }
    -------------------------------------------------------------------------- */
 .page-title {
   font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.875rem;
-  line-height: 2.25rem;
+  font-style: normal;
+  font-size: 2.5rem;
+  line-height: 1.15;
   font-weight: 400;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -173,10 +181,10 @@ em     { font-style: italic; }
 
 .section-heading {
   font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 400;
+  font-style: normal;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
   color: var(--foreground);
   margin-top: 32px;
   margin-bottom: 16px;
@@ -499,10 +507,10 @@ em     { font-style: italic; }
 
 .post-body h2 {
   font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 400;
+  font-style: normal;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
   margin-top: 32px;
   margin-bottom: 12px;
   color: var(--foreground);
@@ -602,4 +610,10 @@ em     { font-style: italic; }
     float: none;
     margin: 0 0 24px 0;
   }
+}
+
+/* Code keeps a monospace face now that body text is Inter */
+code, pre, kbd, samp {
+  font-family: var(--font-code);
+  font-size: 0.9em;
 }
