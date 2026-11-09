@@ -73,6 +73,28 @@ a:hover {
   text-decoration-color: rgba(0, 0, 0, 0.5);
 }
 
+/* Links inside running text are always underlined so they can be found
+   without hovering; hover adds a warm highlight. */
+.home-lead a,
+.about-bio a,
+.timeline-desc a,
+.timeline-desc-list a,
+.site-footer a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--border);
+}
+
+.home-lead a:hover,
+.about-bio a:hover,
+.timeline-desc a:hover,
+.timeline-desc-list a:hover,
+.site-footer a:hover {
+  background: var(--muted);
+  text-decoration-thickness: 2px;
+}
+
 strong { font-weight: 600; }
 em     { font-style: italic; }
 
