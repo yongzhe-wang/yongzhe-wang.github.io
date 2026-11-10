@@ -1,0 +1,84 @@
+<p><em>Also published on <a href="https://yongzhe-wang.github.io/blog/2026-11-latency.html">my website</a>, with interactive figures and citations.</em></p>
+<h2>The budget</h2>
+
+<p>A policy like π<sub>0.5</sub> answers with a chunk of actions, and the robot asks for the next chunk while it plays the current one<sup>1,2</sup>. For a DROID setup at 15 Hz with 8 actions per chunk, the next answer has to arrive within about 533 ms or the arm runs out of actions and stops. <strong>Everything between the robot and the GPU has to fit inside that one number.</strong> The numbers below come from more than 170 of our own measurement records between September and November 2026, some by a tester using the platform as an ordinary user and some by our own engineers. Each is a median unless it says otherwise.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig1.png" alt="Figure 1"></p>
+<p><em><strong>Figure 1.</strong> Median time from a robot sending its observation to holding its next chunk. On a nearby client the model is almost all of it. On real arms the rest grows, from camera reads to longer network paths, and a large model alone can overrun its budget: the 7B model's arm played 1.07 s of actions and then stood still for about 1.3 s waiting.</em></p>
+
+<p>On a nearby client, π<sub>0.5</sub> on an L4 answered in 222 ms, and 187 ms of that was the model. The network round trip was under 10 ms and the wait in the worker under 4 ms. Inference is the cost of the model. Everything else is the cost of the system, and that is the part we can shrink.</p>
+
+<h2>Distance</h2>
+
+<p>The fastest way to lose the budget is to put the GPU far from the robot. Cloud robotics systems have long offloaded computation to whatever server is available<sup>3</sup>, but a robot's control loop pays for every millisecond of the round trip, every time.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig2.png" alt="Figure 2"></p>
+<p><em><strong>Figure 2.</strong> The same robot client and the same simulated π0.5 (a fixed 230 ms of compute), with its worker near or far away. Time spent outside the worker went from 94 ms to 411 ms, and the far worker missed the chunk budget at the median. Routing each robot to the region nearest its public address is now the default; a probe with no model behind it answers in 24 to 28 ms on the West Coast and 56 ms from the East Coast.</em></p>
+
+<h2>Which GPU</h2>
+
+<p>A faster card helps exactly as much as the model costs. On an A100, π<sub>0.5</sub> answered in 121 ms end to end against 222 ms on an L4. An A100 on the other coast answered in 310 ms, with 191 ms of network. Picking the card and picking the place are the same decision.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig3.png" alt="Figure 3"></p>
+<p><em><strong>Figure 3.</strong> π0.5 for one robot, median end to end. A faster card nearly halves inference, and a worker on the other side of the country gives all of it back to the network.</em></p>
+
+<h2>Batching on a busy card</h2>
+
+<p>Language model servers get most of their efficiency from batching. Robot policies are different: π<sub>0.5</sub> already keeps an L4 busy with a single request.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig4.png" alt="Figure 4"></p>
+<p><em><strong>Figure 4.</strong> π0.5 (DROID) on one L4: time for one batch, and requests answered per second. A single request already keeps the card busy, so sixteen at once buy only about 1.9 times the throughput for eight times the wait. A batch of eight already takes longer than a 15 Hz chunk on this card, before any network time.</em></p>
+
+<p>Sharing a worker still works when the schedule respects each robot's deadline. Two robots on one L4 saw 355 ms each at the median. Four robots spread over two L4 workers also saw 355 ms, with a p99 of 435 ms and 99.9% of answers on time. How the scheduler does this is the subject of our <a href="https://yongzhe-wang.github.io/blog/2026-11-async-batching.html">post on async batching</a>.</p>
+
+<h2>Scheduling for on time answers</h2>
+
+<p>An answer that arrives a little late is as bad as one that never comes: the arm stops. So we measure on time rate, the share of answers that land before the current chunk runs out, alongside latency.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig5.png" alt="Figure 5"></p>
+<p><em><strong>Figure 5.</strong> Share of answers that arrived before the robot's current chunk ran out. The first two bars are four simulated robots with a fixed 230 ms of compute; the third is π0.5 on real GPUs, two workers serving four robots, over 2,216 requests.</em></p>
+
+<p>Asking earlier mattered just as much. With four robots at 20 Hz, a robot that asked for its next chunk only after the last one arrived sat idle 41% of the time. Asking at the fourth step of an eight step chunk brought that to 0.07%.</p>
+
+<h2>The plumbing</h2>
+
+<p>Most of the remaining wins came from ordinary networking and serving work: writing replies in one piece, keeping a connection open and warm before the robot needs it, avoiding a fresh slow start after the link goes quiet, shrinking images on the robot before they are sent, sending observations and actions over one stream, and never putting two copies of a model on one GPU. None of these changes the model, and some of them cut the slowest answers by more than ten times.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig6.png" alt="Figure 6"></p>
+<p><em><strong>Figure 6.</strong> Before and after for the fixes we measured both ways, on a log scale. Each row is its own measurement, with its own percentile and conditions; the rows are not additive.</em></p>
+
+<p>Not every fix was a latency fix. Sending binary frames instead of base64 text cut upload size by about a quarter, but on a 27 ms link the end to end time moved from 254.7 ms to 253.6 ms. We kept it for slow links and stopped expecting it to matter on fast ones.</p>
+
+<h2>Teleoperation: a person in the loop</h2>
+
+<p>The same cloud also carries a second loop: a person driving the robot, to collect demonstrations, rescue a stuck task, or take over where the policy is unsure. Here the budget is set by a human instead of a chunk. Delay between a command and the arm, or between the arm and the operator's screen, is what makes remote driving feel heavy. We route teleoperation through the worker that already serves the robot's policy, so a person and a model take turns on one machine and one connection.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig7.png" alt="Figure 7"></p>
+<p><em><strong>Figure 7.</strong> Teleoperation runs through the same worker and the same connection as inference. The operator sees every frame the policy would see, and the robot keeps its seat while a person drives, so handing control back to the model costs no cold start.</em></p>
+
+<p>That choice means every fix in the previous sections applies to teleoperation too: the nearest region, one long lived stream, connections kept warm. The flip side is honesty about what we have measured. Teleoperation has far fewer readings than inference so far, most runs with only a few samples, and the numbers below should be read that way.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig8.png" alt="Figure 8"></p>
+<p><em><strong>Figure 8.</strong> Round trips with a person in the loop, log scale. The dev rows each cover 60 command segments; the other rows are a handful of readings per run, as few as two, so treat them as ranges and not distributions.</em></p>
+
+<p>Through the platform, a command reached the robot in about 29 ms at the median and 31 ms at p95 on our development setup, on a first pass of 60 segments; a second pass had a p95 of 232 ms, the same kind of tail we chased on the inference side. From a cloud machine near the worker the round trip was about 12 ms, from a laptop between 25 ms and 109 ms.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig9.png" alt="Figure 9"></p>
+<p><em><strong>Figure 9.</strong> Streaming a person's commands. Twenty steps at 10 Hz should take 2.0 s and took between 2.43 and 3.76 s across a few runs in production, so the stream still falls behind the operator's own rate. The robot almost never ran out of commands, and control went back to the model in under a tenth of a second.</em></p>
+
+<p><strong>Handing control back to the model took under a tenth of a second, because the model never left the GPU.</strong> That is the point of keeping the person and the policy on one worker: switching between them is a routing decision, not a restart.</p>
+
+<h2>Cold starts</h2>
+
+<p>The worst wait is the first one. With no machine running, getting a π<sub>0.5</sub> worker to ready took between 4.5 and 9.7 minutes, most of it booting a machine and reading a 13.7 GB image. With a warm worker waiting, a robot connected in 1.4 seconds. Restoring a model from a snapshot instead of compiling it on the spot brought the first inference from 19.5 s to about 1 s. For a fleet that starts every morning, keeping one worker warm is the cheapest latency fix there is.</p>
+
+<h2>What we have not measured yet</h2>
+
+<p>A few gaps are worth saying out loud. We have no before and after for the load cap the scheduler uses. The 7B action model in Figure 1 has had fixes since that run, and we have not measured it again. And we have not run π<sub>0.5</sub> on an H100 ourselves. For teleoperation we have not yet measured the one way time from an operator's command to the robot's action, the delay of video to the operator, or how distance changes either; a dedicated round of teleoperation experiments is next. Real time chunking<sup>1</sup> and asynchronous inference<sup>2</sup> would hide some of the remaining time on the robot side; measuring them together with the numbers above is next.</p>
+
+<h2>References</h2>
+<ol>
+  <li>K. Black, M. Y. Galliker, S. Levine. <a href="https://arxiv.org/abs/2506.07339">Real-Time Execution of Action Chunking Flow Policies</a>. 2025.</li>
+  <li>F. Capuano, S. Palma, M. Aractingi, et al. <a href="https://huggingface.co/blog/async-robot-inference">Asynchronous Robot Inference: Decoupling Action Prediction and Execution</a>. Hugging Face, 2025.</li>
+  <li>J. Ichnowski, K. Chen, K. Dharmarajan, et al. <a href="https://arxiv.org/abs/2205.09778">FogROS2: An Adaptive Platform for Cloud and Fog Robotics Using ROS 2</a>. ICRA 2023.</li>
+</ol>
