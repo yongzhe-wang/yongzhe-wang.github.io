@@ -25,7 +25,15 @@
   h2 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; margin: 56px 0 12px; }
   p { margin: 0 0 18px; }
   a { color: var(--ink); text-underline-offset: 3px; }
-  sup a { text-decoration: none; color: var(--a); font-size: 12px; }
+  sup a { text-decoration: none; color: var(--a); font-size: 12px; font-weight: 600; padding: 0 2px; border-radius: 4px; }
+  sup a:hover, sup a:focus-visible, sup a.on { background: #e8eef5; outline: none; }
+  .fn-pop { position: absolute; z-index: 50; max-width: 360px; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06); padding: 12px 14px; font-size: 14px; line-height: 1.5; color: #333; opacity: 0; transform: translateY(4px); transition: opacity 120ms ease, transform 120ms ease; pointer-events: none; }
+  .fn-pop.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .fn-pop .n { display: inline-block; min-width: 20px; font-weight: 600; color: var(--a); }
+  .fn-pop a { color: var(--ink); }
+  .fn-pop + .fn-pop { margin-top: 0; }
+  .fn-pop .item + .item { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  ol.refs li:target { background: #fff7d6; border-radius: 4px; }
   figure { margin: 36px -20px 36px; padding: 24px 20px 14px; background: var(--soft); border-radius: 10px; }
   figure svg { width: 100%; height: auto; display: block; }
   figcaption { font-size: 14px; color: var(--mute); line-height: 1.55; margin-top: 12px; }
@@ -259,5 +267,68 @@
 </ol>
 
 </main>
+
+<script>
+/* Footnote previews: hovering, focusing or tapping a citation shows the full reference in a card beside it;
+   clicking the number still jumps to the reference list. */
+(function () {
+  var pop = document.createElement("div");
+  pop.className = "fn-pop";
+  pop.setAttribute("role", "tooltip");
+  document.body.appendChild(pop);
+  var current = null, hideTimer = null;
+
+  function refsFor(sup) {
+    return Array.prototype.map.call(sup.querySelectorAll('a[href^="#r"]'), function (a) {
+      var li = document.getElementById(a.getAttribute("href").slice(1));
+      return li ? '<div class="item"><span class="n">' + a.textContent + '</span>' + li.innerHTML + "</div>" : "";
+    }).join("");
+  }
+  function place(anchor) {
+    var r = anchor.getBoundingClientRect(), w = Math.min(360, window.innerWidth - 24);
+    pop.style.maxWidth = w + "px";
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+    var top = r.bottom + 8;
+    pop.style.left = left + window.scrollX + "px";
+    pop.style.top = top + window.scrollY + "px";
+    var h = pop.offsetHeight;
+    if (r.bottom + 8 + h > window.innerHeight && r.top - 8 - h > 0) pop.style.top = r.top - 8 - h + window.scrollY + "px";
+  }
+  function show(a) {
+    clearTimeout(hideTimer);
+    var sup = a.closest("sup");
+    if (current) current.classList.remove("on");
+    current = a; a.classList.add("on");
+    pop.innerHTML = refsFor(sup);
+    place(a);
+    pop.classList.add("show");
+  }
+  function hide() {
+    hideTimer = setTimeout(function () {
+      pop.classList.remove("show");
+      if (current) current.classList.remove("on");
+      current = null;
+    }, 150);
+  }
+  document.querySelectorAll('sup a[href^="#r"]').forEach(function (a) {
+    a.setAttribute("aria-describedby", "fn-pop");
+    a.addEventListener("mouseenter", function () { show(a); });
+    a.addEventListener("mouseleave", hide);
+    a.addEventListener("focus", function () { show(a); });
+    a.addEventListener("blur", hide);
+    a.addEventListener("click", function (e) {
+      if (window.matchMedia("(hover: none)").matches && current !== a) { e.preventDefault(); show(a); }
+    });
+  });
+  pop.id = "fn-pop";
+  pop.addEventListener("mouseenter", function () { clearTimeout(hideTimer); });
+  pop.addEventListener("mouseleave", hide);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") hide(); });
+  document.addEventListener("click", function (e) {
+    if (!pop.contains(e.target) && !(e.target.closest && e.target.closest("sup"))) hide();
+  });
+  window.addEventListener("scroll", function () { if (current) place(current); }, { passive: true });
+})();
+</script>
 </body>
 </html>
