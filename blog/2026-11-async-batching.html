@@ -109,7 +109,44 @@
 
 <h2>Action chunks create slack</h2>
 
+<figure>
+<svg viewBox="0 0 680 330" role="img" aria-label="A policy turns one observation into a chunk of actions; the robot replans every four steps">
+  <defs><marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#111"/></marker></defs>
+  <g font-size="12">
+    <rect x="20" y="20" width="150" height="46" rx="6" fill="#fff" stroke="#cfcfcf"/>
+    <text x="95" y="39" text-anchor="middle" font-weight="600">observation oₜ</text>
+    <text x="95" y="56" text-anchor="middle" fill="#6b6b6b">images, joints, instruction</text>
+    <line x1="172" y1="43" x2="206" y2="43" stroke="#111" stroke-width="1.5" marker-end="url(#pa)"/>
+    <rect x="210" y="20" width="80" height="46" rx="6" fill="#111"/>
+    <text x="250" y="48" text-anchor="middle" fill="#fff" font-weight="600">policy π</text>
+    <line x1="292" y1="43" x2="326" y2="43" stroke="#111" stroke-width="1.5" marker-end="url(#pa)"/>
+    <rect x="330" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="350.0" y="47" text-anchor="middle" fill="#111">a₀</text><rect x="370" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="390.0" y="47" text-anchor="middle" fill="#111">a₁</text><rect x="410" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="430.0" y="47" text-anchor="middle" fill="#111">a₂</text><rect x="450" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="470.0" y="47" text-anchor="middle" fill="#111">a₃</text><rect x="490" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="510.0" y="47" text-anchor="middle" fill="#111">a₄</text><rect x="530" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="550.0" y="47" text-anchor="middle" fill="#111">a₅</text><rect x="570" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="590.0" y="47" text-anchor="middle" fill="#111">a₆</text><rect x="610" y="29" width="40" height="28" fill="#d4e0ec" stroke="#2f5d8a"/><text x="630.0" y="47" text-anchor="middle" fill="#111">a₇</text>
+    <text x="490" y="82" text-anchor="middle" fill="#6b6b6b">one action chunk: L = 8 future actions</text>
+
+    <text x="20" y="146" font-weight="600">chunk 1</text><text x="20" y="161" fill="#6b6b6b">from oₜ</text>
+    <rect x="150" y="134" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="170.0" y="152" text-anchor="middle" fill="#fff">a₀</text><rect x="190" y="134" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="210.0" y="152" text-anchor="middle" fill="#fff">a₁</text><rect x="230" y="134" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="250.0" y="152" text-anchor="middle" fill="#fff">a₂</text><rect x="270" y="134" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="290.0" y="152" text-anchor="middle" fill="#fff">a₃</text><rect x="310" y="134" width="40" height="28" fill="#f1f1ee" stroke="#fff"/><text x="330.0" y="152" text-anchor="middle" fill="#aaa">a₄</text><rect x="350" y="134" width="40" height="28" fill="#f1f1ee" stroke="#fff"/><text x="370.0" y="152" text-anchor="middle" fill="#aaa">a₅</text><rect x="390" y="134" width="40" height="28" fill="#f1f1ee" stroke="#fff"/><text x="410.0" y="152" text-anchor="middle" fill="#aaa">a₆</text><rect x="430" y="134" width="40" height="28" fill="#f1f1ee" stroke="#fff"/><text x="450.0" y="152" text-anchor="middle" fill="#aaa">a₇</text>
+    <text x="390" y="180" text-anchor="middle" fill="#999">replaced before it runs</text>
+
+    <text x="20" y="214" font-weight="600">chunk 2</text><text x="20" y="229" fill="#6b6b6b">from oₜ₊₄</text>
+    <rect x="310" y="202" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="330.0" y="220" text-anchor="middle" fill="#fff">b₀</text><rect x="350" y="202" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="370.0" y="220" text-anchor="middle" fill="#fff">b₁</text><rect x="390" y="202" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="410.0" y="220" text-anchor="middle" fill="#fff">b₂</text><rect x="430" y="202" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="450.0" y="220" text-anchor="middle" fill="#fff">b₃</text><rect x="470" y="202" width="40" height="28" fill="#f4e7da" stroke="#fff"/><text x="490.0" y="220" text-anchor="middle" fill="#7a5a3a">b₄</text><rect x="510" y="202" width="40" height="28" fill="#f4e7da" stroke="#fff"/><text x="530.0" y="220" text-anchor="middle" fill="#7a5a3a">b₅</text><rect x="550" y="202" width="40" height="28" fill="#f4e7da" stroke="#fff"/><text x="570.0" y="220" text-anchor="middle" fill="#7a5a3a">b₆</text><rect x="590" y="202" width="40" height="28" fill="#f4e7da" stroke="#fff"/><text x="610.0" y="220" text-anchor="middle" fill="#7a5a3a">b₇</text>
+    <text x="550" y="248" text-anchor="middle" fill="#b5651d">replaced in turn by chunk 3</text>
+
+    <text x="20" y="282" font-weight="600">robot runs</text>
+    <rect x="150" y="270" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="170.0" y="288" text-anchor="middle" fill="#fff">a₀</text><rect x="190" y="270" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="210.0" y="288" text-anchor="middle" fill="#fff">a₁</text><rect x="230" y="270" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="250.0" y="288" text-anchor="middle" fill="#fff">a₂</text><rect x="270" y="270" width="40" height="28" fill="#2f5d8a" stroke="#fff"/><text x="290.0" y="288" text-anchor="middle" fill="#fff">a₃</text><rect x="310" y="270" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="330.0" y="288" text-anchor="middle" fill="#fff">b₀</text><rect x="350" y="270" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="370.0" y="288" text-anchor="middle" fill="#fff">b₁</text><rect x="390" y="270" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="410.0" y="288" text-anchor="middle" fill="#fff">b₂</text><rect x="430" y="270" width="40" height="28" fill="#b5651d" stroke="#fff"/><text x="450.0" y="288" text-anchor="middle" fill="#fff">b₃</text>
+    <g fill="#6b6b6b" text-anchor="middle"><text x="170" y="316">0</text><text x="210" y="316">1</text><text x="250" y="316">2</text><text x="290" y="316">3</text><text x="330" y="316">4</text><text x="370" y="316">5</text><text x="410" y="316">6</text><text x="450" y="316">7</text></g>
+    <text x="490" y="316" fill="#6b6b6b">control steps at 15 Hz</text>
+
+    <line x1="310" y1="118" x2="310" y2="300" stroke="#111" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="316" y="124" fill="#111" font-weight="600">replan at r = 4: send oₜ₊₄</text>
+    <line x1="290" y1="166" x2="290" y2="198" stroke="#111" stroke-width="1.2" marker-end="url(#pa)"/>
+  </g>
+</svg>
+<figcaption><b>Figure 2.</b> A policy maps one observation to a chunk of future actions. The robot runs only the first r of them; at the replan step it captures a fresh observation and asks again, and the new chunk takes over from the old one. With r = 4 and L = 8, every action the robot runs comes from an observation at most four steps old, while the model is called only once every four steps. The new chunk is drawn arriving instantly; the next figure shows the time it really takes.</figcaption>
+</figure>
+
 <p>Modern robot policies do not predict one action at a time. ACT<sup><a href="#r7">7</a></sup> and Diffusion Policy<sup><a href="#r8">8</a></sup> made it standard to predict a chunk of future actions, and today's large models, from OpenVLA<sup><a href="#r9">9</a></sup> to π<sub>0</sub><sup><a href="#r10">10</a></sup> and π<sub>0.5</sub><sup><a href="#r11">11</a></sup>, do the same. A chunk is a promise: the robot knows what to do for the next few steps, whether or not a new answer has arrived.</p>
+
+<p>Replanning is what keeps a chunked policy closed loop. A policy π maps an observation o<sub>t</sub> (camera images, joint state and the instruction) to a chunk of L future actions. The robot does not play the whole chunk: after r of them it captures a fresh observation and asks again, and when the new chunk arrives it replaces whatever was left of the old one. A small r reacts faster but calls the model more often. A large L is a longer promise, and the room between r and L is how long the robot can keep going on the old chunk if the next one is late.</p>
 
 <p>That promise is what makes asynchronous execution possible. Real time chunking from Physical Intelligence<sup><a href="#r12">12</a></sup> starts computing the next chunk while the current one is still being executed, and freezes the actions that will run during the delay so the two chunks join smoothly. SmolVLA and LeRobot's async inference<sup><a href="#r13">13</a>,<a href="#r14">14</a></sup> decouple the robot from the policy server in the same spirit: the robot sends a new observation when its action queue drops below a threshold and keeps moving while the server thinks.</p>
 
@@ -145,7 +182,7 @@
     <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#9a9a9a"/></marker>
   </defs>
 </svg>
-<figcaption><b>Figure 2.</b> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</figcaption>
+<figcaption><b>Figure 3.</b> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</figcaption>
 </figure>
 
 <p>Prior work uses this slack to hide latency for one robot. Our observation is that the same slack is exactly what a server needs to batch. If a robot's answer is not needed for another 267 ms, the server is free to hold its request for part of that time and let it leave together with requests from other robots.</p>
@@ -171,7 +208,7 @@
     <text x="660" y="182" text-anchor="end" fill="#6b6b6b">time</text>
   </g>
 </svg>
-<figcaption><b>Figure 3.</b> Closed loop robots naturally fall out of phase and take turns. Each one waits for the other's whole inference before its own starts, so the GPU never sees a batch. Measured on an L4: one robot alone saw a median round trip of 368 ms; two robots sharing one copy saw 515 ms each. Running two copies side by side instead slowed every inference from 241 ms to 334 ms.</figcaption>
+<figcaption><b>Figure 4.</b> Closed loop robots naturally fall out of phase and take turns. Each one waits for the other's whole inference before its own starts, so the GPU never sees a batch. Measured on an L4: one robot alone saw a median round trip of 368 ms; two robots sharing one copy saw 515 ms each. Running two copies side by side instead slowed every inference from 241 ms to 334 ms.</figcaption>
 </figure>
 
 <p>The batching window was too short to catch the other robot, and making it longer would add the same delay to every request whether or not anyone else was coming. A fixed window is a single latency target for the whole model, which is how web serving thinks. Robots each have their own deadline, set by where they are in their chunk.</p>
@@ -200,7 +237,7 @@
     <line x1="250" y1="253" x2="290" y2="253" stroke="#555" opacity="0.35" stroke-width="2"/><text x="298" y="256" fill="#6b6b6b">slack it can spend waiting</text>
   </g>
 </svg>
-<figcaption><b>Figure 4.</b> Four robots ask at different moments. A is held until B arrives, and the pair leaves well before A's deadline; C and D do the same later. The scheduler prefers the fewest, smallest batches that keep everyone on time: two batches of two, not one batch of four.</figcaption>
+<figcaption><b>Figure 5.</b> Four robots ask at different moments. A is held until B arrives, and the pair leaves well before A's deadline; C and D do the same later. The scheduler prefers the fewest, smallest batches that keep everyone on time: two batches of two, not one batch of four.</figcaption>
 </figure>
 
 <p>Every request carries two numbers from the robot: how long its requests spend outside the worker (network, encoding and decoding, measured by the robot itself), and how much of its current chunk is left. From those the worker computes a deadline for each request: the latest moment its answer may leave and still reach the robot before the chunk runs out, with 50 ms to spare. An open batch waits for the other robots on the same copy, but only for robots that can actually arrive before the earliest deadline in the batch. A robot cannot ask again sooner than r steps after its last request, so the worker knows who is worth waiting for. Our first version waited for every robot on the copy; with four robots it formed batches of two that each waited for a partner who could not come, and 45% of answers arrived late. Waiting only for robots that can arrive fixed it.</p>
@@ -243,7 +280,7 @@
     <text x="150" y="216" fill="#111">batch p95 + round trip + 50 ms</text>
   </g>
 </svg>
-<figcaption><b>Figure 5.</b> A worked example from our SDK documentation: a slow policy whose batches of 1, 2, 4 and 8 answer in 1.09, 1.16, 1.28 and 1.61 s (p95) on an L4, for robots 47 ms from their worker. Without a declared wait it seats one robot per copy. Allowing 1.3 s seats two, 1.4 s seats four, and 1.75 s seats eight, because batching is nearly free for this model until the batch gets large.</figcaption>
+<figcaption><b>Figure 6.</b> A worked example from our SDK documentation: a slow policy whose batches of 1, 2, 4 and 8 answer in 1.09, 1.16, 1.28 and 1.61 s (p95) on an L4, for robots 47 ms from their worker. Without a declared wait it seats one robot per copy. Allowing 1.3 s seats two, 1.4 s seats four, and 1.75 s seats eight, because batching is nearly free for this model until the batch gets large.</figcaption>
 </figure>
 
 <p>This is the same trade every serving system makes, with one difference: the developer chooses it per policy, in units their robot understands, and the robot's own code decides what to do while it waits.</p>
@@ -269,7 +306,7 @@
     <text x="636" y="94" text-anchor="end" fill="#6b6b6b">whole chunk = 533 ms</text>
   </g>
 </svg>
-<figcaption><b>Figure 6.</b> π<sub>0.5</sub> (LIBERO) on an NVIDIA L4, measured on our platform from simultaneous arrival. A batch of 16 took 2,270 ms, about 142 ms per request. Only a batch of one fits a 15 Hz, 8 step chunk after the network, so on this card the scheduler correctly seats one robot per copy.</figcaption>
+<figcaption><b>Figure 7.</b> π<sub>0.5</sub> (LIBERO) on an NVIDIA L4, measured on our platform from simultaneous arrival. A batch of 16 took 2,270 ms, about 142 ms per request. Only a batch of one fits a 15 Hz, 8 step chunk after the network, so on this card the scheduler correctly seats one robot per copy.</figcaption>
 </figure>
 
 <table>
