@@ -1,0 +1,44 @@
+<p><em>Also published on <a href="https://yongzhe-wang.github.io/blog/2026-11-latency.html">my website</a>, with interactive figures and citations.</em></p>
+<h2>The budget</h2>
+
+<p>A policy like π<sub>0.5</sub> answers with a chunk of actions, and the robot asks for the next chunk while it plays the current one<sup>1,2</sup>. For a DROID setup at 15 Hz with 8 actions per chunk, the next answer has to arrive within about 533 ms or the arm runs out of actions and stops. <strong>Every millisecond the network takes is a millisecond the model cannot have.</strong> The numbers below come from more than 170 of our own measurement records between September and November 2026, some by a tester using the platform as an ordinary user and some by our own engineers. Each is a median unless it says otherwise.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig1.png" alt="Figure 1"></p>
+<p><em><strong>Figure 1.</strong> Median time from a robot sending its observation to holding its next chunk, split into the model's inference and everything around it: the network, sending frames, reading them. On a nearby client the network is a sliver. On real arms and longer paths it grows into a real share of the budget.</em></p>
+<p>On a nearby client, π<sub>0.5</sub> on an L4 answered in 222 ms, and the network round trip was under 10 ms of that. A real xArm6 spent 29 ms on the round trip plus another 40 ms or so reading its camera and sending frames. A 7B model driving an SO-101 from the East Coast spent 98 ms on the round trip and 158 ms outside its worker in all. None of these is the biggest cost on its own, but on a tight budget each one decides whether the arm keeps moving.</p>
+
+<h2>Distance</h2>
+
+<p>The fastest way to lose the budget is to put the GPU far from the robot. Cloud robotics systems have long offloaded computation to whatever server is available<sup>3</sup>, but a robot's control loop pays for every millisecond of the round trip, every time it asks.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig2.png" alt="Figure 2"></p>
+<p><em><strong>Figure 2.</strong> The same robot client and the same simulated π0.5 (a fixed 230 ms of compute), with its worker near or far away. Time spent outside the worker went from 94 ms to 411 ms, and the far worker missed the chunk budget at the median. Routing each robot to the region nearest its public address is now the default; a probe with no model behind it answers in 24 to 28 ms on the West Coast and 56 ms from the East Coast.</em></p>
+<p>So the platform now routes each robot to the region nearest its public address. That before and after did not run on the same machines, so we read it as a direction rather than an exact gain: robots that used to land on a worker about 290 ms away now reach one in tens of milliseconds.</p>
+
+<h2>Distance can erase a faster GPU</h2>
+
+<p>A faster card only helps if the network does not give the time back. On an A100 nearby, π<sub>0.5</sub> answered in 121 ms end to end. An A100 on the other coast answered in 310 ms, with 191 ms of it on the network, slower than an L4 next door.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig3.png" alt="Figure 3"></p>
+<p><em><strong>Figure 3.</strong> π0.5 for one robot, median end to end. A faster card nearly halves inference, and a worker on the other side of the country gives all of it back to the network.</em></p>
+<h2>The plumbing</h2>
+
+<p>The rest of the wins came from ordinary networking work, none of which touches the model: writing each reply in one piece instead of two, keeping a connection open and warm before the robot needs it, not letting a quiet link restart its slow start, shrinking images on the robot before they are sent, and carrying observations and actions over one long lived stream. The largest single change was replacing a relay with an encrypted tunnel, which took the slowest answers from seconds to about a tenth of a second.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/latency/fig4.png" alt="Figure 4"></p>
+<p><em><strong>Figure 4.</strong> Before and after for the network fixes we measured both ways, on a log scale. Each row is its own measurement with its own percentile and conditions, so the rows do not add up.</em></p>
+
+<p>A quiet link was a quieter problem than it looked. With an act every half second on a 21 ms line, 52 acts in a run paid for an extra round trip after the connection had gone idle; once the link was kept from restarting its slow start, one did.</p>
+
+<p>Not every fix was a latency fix. Sending binary frames instead of base64 text cut upload size by about a quarter, but on a 27 ms link the end to end time moved from 254.7 ms to 253.6 ms. Fewer bytes matter on slow links and barely at all on fast ones.</p>
+
+<h2>What we have not measured yet</h2>
+
+<p>A few gaps are worth saying out loud. Our before and after for nearest region routing was not a strict A/B on the same machines. We have not split the round trip into upload and download for every setup, and we have not mapped how latency grows with distance across every region pair. Real time chunking<sup>1</sup> and asynchronous inference<sup>2</sup> would hide some of the remaining network time on the robot side; measuring them together with the numbers above is next.</p>
+
+<h2>References</h2>
+<ol>
+  <li>K. Black, M. Y. Galliker, S. Levine. <a href="https://arxiv.org/abs/2506.07339">Real-Time Execution of Action Chunking Flow Policies</a>. 2025.</li>
+  <li>F. Capuano, S. Palma, M. Aractingi, et al. <a href="https://huggingface.co/blog/async-robot-inference">Asynchronous Robot Inference: Decoupling Action Prediction and Execution</a>. Hugging Face, 2025.</li>
+  <li>J. Ichnowski, K. Chen, K. Dharmarajan, et al. <a href="https://arxiv.org/abs/2205.09778">FogROS2: An Adaptive Platform for Cloud and Fog Robotics Using ROS 2</a>. ICRA 2023.</li>
+</ol>
