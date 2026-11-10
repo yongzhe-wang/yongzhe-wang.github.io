@@ -253,7 +253,7 @@
 
 <p>We picked 90% from measurements. On a DROID policy, two robots per copy at 90% load got 94.1% of their answers back in time, and four robots at 96% load got only 85.7%. Periodic robots naturally settle into gaps between each other's batches until the GPU is nearly full, and then pile up behind each other all at once, so the cap sits just below the knee.</p>
 
-<p>When a copy cannot seat a robot for ten seconds in a row, the worker reports it, the platform opens another worker, and the robot moves at its next episode boundary rather than in the middle of a motion. New robots join the worker nearest to them first, then the least busy one. Nothing here needs a shared clock between robots, a change to the model, or the robot to know that anyone else exists. A policy that asks only at the last valid step of its chunk has no slack and gets one robot per copy, which is the safe default.</p>
+<p>None of this needs a shared clock between robots, a change to the model, or the robot to know that anyone else exists. And a policy that asks only at the last valid step of its chunk has no slack to share, so it gets one robot per copy.</p>
 
 <h2>Trading a little wait for density</h2>
 
