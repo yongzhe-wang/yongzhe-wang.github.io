@@ -1,0 +1,101 @@
+<p><em>Also published on <a href="https://yongzhe-wang.github.io/blog/2026-11-async-batching.html">my website</a>, with interactive figures and citations.</em></p>
+<h2>Why batching is hard for robots</h2>
+
+<p>Large model serving is cheap because of batching. A GPU that answers one request in 30 ms can often answer sixteen in 60 ms, and systems from Clipper<sup>1</sup> and Clockwork<sup>2</sup> to NVIDIA Triton's dynamic batcher<sup>3</sup> are built around one idea: hold a request for a few milliseconds so that it can leave with others, as long as everyone still finishes inside a latency target. Orca<sup>4</sup> and vLLM<sup>5</sup> pushed this further for language models by rescheduling the batch at every generated token.</p>
+
+<p>A robot is a different kind of client. Every robot runs its own closed control loop, on its own clock, and a late answer is not a slow page load: the arm stops, or acts on a stale plan. Cloud robotics work such as FogROS2<sup>6</sup> showed that offloading heavy computation is worth it, but a cloud that serves one robot per GPU is too expensive to be the default. So the question we care about is simple to state. Can several robots share one copy of a vision language action model without any of them waiting longer than its control loop allows?</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig1.png" alt="Figure 1"></p>
+<p><em><strong>Figure 1.</strong> A web request is one shot. A robot's request is one turn of a loop that runs as long as the robot is on, at its own control rate and its own phase. Robots never line up their requests with each other, so any batching has to happen without asking them to.</em></p>
+
+<h2>Action chunks create slack</h2>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig2.png" alt="Figure 2"></p>
+<p><em><strong>Figure 2.</strong> A policy maps one observation to a chunk of future actions. The robot runs only the first r of them; at the replan step it captures a fresh observation and asks again, and the new chunk takes over from the old one. With r = 4 and L = 8, every action the robot runs comes from an observation at most four steps old, while the model is called only once every four steps. The new chunk is drawn arriving instantly; the next figure shows the time it really takes.</em></p>
+
+<p>Modern robot policies do not predict one action at a time. ACT<sup>7</sup> and Diffusion Policy<sup>8</sup> made it standard to predict a chunk of future actions, and today's large models, from OpenVLA<sup>9</sup> to π<sub>0</sub><sup>10</sup> and π<sub>0.5</sub><sup>11</sup>, do the same. A chunk is a promise: the robot knows what to do for the next few steps, whether or not a new answer has arrived.</p>
+
+<p>Replanning is what keeps a chunked policy closed loop. A policy π maps an observation o<sub>t</sub> (camera images, joint state and the instruction) to a chunk of L future actions. The robot does not play the whole chunk: after r of them it captures a fresh observation and asks again, and when the new chunk arrives it replaces whatever was left of the old one. A small r reacts faster but calls the model more often. A large L is a longer promise, and the room between r and L is how long the robot can keep going on the old chunk if the next one is late.</p>
+
+<p>That promise is what makes asynchronous execution possible. Real time chunking from Physical Intelligence<sup>12</sup> starts computing the next chunk while the current one is still being executed, and freezes the actions that will run during the delay so the two chunks join smoothly. SmolVLA and LeRobot's async inference<sup>13,14</sup> decouple the robot from the policy server in the same spirit: the robot sends a new observation when its action queue drops below a threshold and keeps moving while the server thinks.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig3.png" alt="Figure 3"></p>
+<p><em><strong>Figure 3.</strong> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</em></p>
+
+<p>Prior work uses this slack to hide latency for one robot. Our observation is that the same slack is exactly what a server needs to batch. <strong>If a robot's answer is not needed for another 267 ms, the server is free to hold its request for part of that time and let it leave together with requests from other robots.</strong></p>
+
+<h2>What goes wrong without it</h2>
+
+<p>We first tried the obvious thing on our platform: two robots running π<sub>0.5</sub> (LIBERO) closed loop against one copy of the model on an NVIDIA L4, with a short batching window of 10 ms. Each robot sends its next request as soon as the last answer arrives. Over 120 requests per robot, only 2 left in a batch of two.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig4.png" alt="Figure 4"></p>
+<p><em><strong>Figure 4.</strong> Closed loop robots naturally fall out of phase and take turns. Each one waits for the other's whole inference before its own starts, so the GPU never sees a batch. Measured on an L4: one robot alone saw a median round trip of 368 ms; two robots sharing one copy saw 515 ms each. Running two copies side by side instead slowed every inference from 241 ms to 334 ms.</em></p>
+
+<p>The batching window was too short to catch the other robot, and making it longer would add the same delay to every request whether or not anyone else was coming. A fixed window is a single latency target for the whole model, which is how web serving thinks. Robots each have their own deadline, set by where they are in their chunk.</p>
+
+<h2>Async batching</h2>
+
+<p>Our scheduler replaces the fixed window with each robot's own deadline. Robots keep asking on their own clocks; nobody is told when to send. When a request arrives, the worker knows from the policy's declaration how much slack that robot has left: the steps between its replan step and the end of its chunk, at its control rate, minus its measured round trip and a 50 ms margin. The request is held only as long as that slack allows, and leaves with whatever else is waiting when holding any longer would make some robot late.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig5.png" alt="Figure 5"></p>
+<p><em><strong>Figure 5.</strong> Four robots ask at different moments. A is held until B arrives, and the pair leaves well before A's deadline; C and D do the same later. The scheduler prefers the fewest, smallest batches that keep everyone on time: two batches of two, not one batch of four.</em></p>
+
+<p>Every request carries two numbers from the robot: how long its requests spend outside the worker (network, encoding and decoding, measured by the robot itself), and how much of its current chunk is left. From those the worker computes a deadline for each request: the latest moment its answer may leave and still reach the robot before the chunk runs out, with 50 ms to spare. An open batch waits for the other robots on the same copy, but only for robots that can actually arrive before the earliest deadline in the batch. A robot cannot ask again sooner than r steps after its last request, so the worker knows who is worth waiting for. Our first version waited for every robot on the copy; with four robots it formed batches of two that each waited for a partner who could not come, and 45% of answers arrived late. Waiting only for robots that can arrive fixed it.</p>
+
+<h2>Each robot on its own clock</h2>
+
+<p>Robots are not the same distance from their worker. If one robot has a 300 ms round trip and three have 60 ms, a single rule for the whole copy would shrink every batch to what the far robot can afford. Instead each robot gets its own fit: the largest batch it can join and still be answered in time.</p>
+
+<p><em>fit(i) = max b such that T(b) + RTT(i) + 50 ms ≤ slack(i)</em></p>
+
+<p>Here T(b) is the measured time of a batch of b on this worker, RTT(i) the round trip robot i reports, and slack(i) what is left of its chunk, (L − r) / hz for a robot on schedule. A far robot is batched apart, in batches its own fit allows, and no batch waits for it; it costs only its own load and never lowers anyone else's batch size. When a worker starts, it times every batch size the model was compiled for on a sample episode, and then seats robots nearest first, as long as every robot's batches stay on time and all the batches together use at most 90% of the time between one robot's requests.</p>
+
+<p>We picked 90% from measurements. On a DROID policy, two robots per copy at 90% load got 94.1% of their answers back in time, and four robots at 96% load got only 85.7%. Periodic robots naturally settle into gaps between each other's batches until the GPU is nearly full, and then pile up behind each other all at once, so the cap sits just below the knee.</p>
+
+<p>None of this needs a shared clock between robots, a change to the model, or the robot to know that anyone else exists. And a policy that asks only at the last valid step of its chunk has no slack to share, so it gets one robot per copy.</p>
+
+<h2>Trading a little wait for density</h2>
+
+<p>Some policies are slow enough that a chunk's slack is smaller than one inference. For them we added one knob, <code>max_wait_for_batch</code>: the developer declares how long a robot may wait for its answer, and the robot stops for at most that long if the answer is not in hand. The worker then seats robots by that wait instead of by the chunk.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig6.png" alt="Figure 6"></p>
+<p><em><strong>Figure 6.</strong> A worked example from our SDK documentation: a slow policy whose batches of 1, 2, 4 and 8 answer in 1.09, 1.16, 1.28 and 1.61 s (p95) on an L4, for robots 47 ms from their worker. Without a declared wait it seats one robot per copy. Allowing 1.3 s seats two, 1.4 s seats four, and 1.75 s seats eight, because batching is nearly free for this model until the batch gets large.</em></p>
+
+<p>This is the same trade every serving system makes, with one difference: the developer chooses it per policy, in units their robot understands, and the robot's own code decides what to do while it waits.</p>
+
+<h2>What we measured, honestly</h2>
+
+<p>The method only helps when the GPU has room to spare inside a robot's budget. For π<sub>0.5</sub> on an L4, it does not yet. A 15 Hz robot executing 8 actions per chunk has 533 ms of motion per chunk, and the network round trip from our measured robots was 237 ms at the median, which leaves under 300 ms for inference.</p>
+
+<p><img src="https://yongzhe-wang.github.io/assets/blog/async-batching/fig7.png" alt="Figure 7"></p>
+<p><em><strong>Figure 7.</strong> π<sub>0.5</sub> (LIBERO) on an NVIDIA L4, measured on our platform from simultaneous arrival. A batch of 16 took 2,270 ms, about 142 ms per request. Only a batch of one fits a 15 Hz, 8 step chunk after the network, so on this card the scheduler correctly seats one robot per copy.</em></p>
+
+<ul><li>One robot, one copy: median 368 ms, p95 444 ms</li><li>Two robots, one copy, fixed 10 ms window: median 515 ms, p95 592 to 633 ms</li><li>Two robots, two copies on the same card: median 599 to 605 ms, p95 705 to 713 ms</li></ul>
+
+<p>We report this because it is the point of the design. The seat count comes from the model's own timings and the robot's own chunk, so the platform never packs robots onto a card that cannot keep them on time. The same rule seats more robots on faster cards, on longer chunks, on lighter models, and closer to the robot, and every 100 ms saved on the network is 100 ms more for batching.</p>
+
+<blockquote><p>The scheduler described here runs in production on General Sequences today. A policy declares its control rate, replan step and valid length, and optionally <code>max_wait_for_batch</code>; the platform does the rest.</p></blockquote>
+
+<h2>What comes next</h2>
+
+<p>Batching at the level of a whole chunk has a floor: a request that arrives just after a batch starts must wait for that entire inference. Language model servers removed the same floor by rescheduling at every token<sup>4</sup>. Flow matching policies such as π<sub>0</sub> already take a separate timestep for every row of a batch, and generate a chunk in about ten denoising steps after encoding the images and instruction once. We are building a scheduler that admits new requests between denoising steps, so a robot waits for at most one step rather than one inference. Because real time chunking also works step by step during denoising<sup>12</sup>, the two fit the same loop.</p>
+
+<p>If you run robot policies and want to try this on your own arms, the SDK and console are at <a href="https://generalsequences.com">generalsequences.com</a>.</p>
+
+<h2>References</h2>
+<ol>
+  <li>D. Crankshaw, X. Wang, G. Zhou, et al. <a href="https://arxiv.org/abs/1612.03079">Clipper: A Low-Latency Online Prediction Serving System</a>. NSDI 2017.</li>
+  <li>A. Gujarati, R. Karimi, S. Alzayat, et al. <a href="https://www.usenix.org/conference/osdi20/presentation/gujarati">Serving DNNs like Clockwork: Performance Predictability from the Bottom Up</a>. OSDI 2020.</li>
+  <li>NVIDIA. <a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html">Triton Inference Server: Batchers</a>.</li>
+  <li>G.-I. Yu, J. S. Jeong, G.-W. Kim, et al. <a href="https://www.usenix.org/conference/osdi22/presentation/yu">Orca: A Distributed Serving System for Transformer-Based Generative Models</a>. OSDI 2022.</li>
+  <li>W. Kwon, Z. Li, S. Zhuang, et al. <a href="https://arxiv.org/abs/2309.06180">Efficient Memory Management for Large Language Model Serving with PagedAttention</a>. SOSP 2023.</li>
+  <li>J. Ichnowski, K. Chen, K. Dharmarajan, et al. <a href="https://arxiv.org/abs/2205.09778">FogROS2: An Adaptive Platform for Cloud and Fog Robotics Using ROS 2</a>. ICRA 2023.</li>
+  <li>T. Z. Zhao, V. Kumar, S. Levine, C. Finn. <a href="https://arxiv.org/abs/2304.13705">Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware</a>. RSS 2023.</li>
+  <li>C. Chi, Z. Xu, S. Feng, et al. <a href="https://arxiv.org/abs/2303.04137">Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</a>. RSS 2023.</li>
+  <li>M. J. Kim, K. Pertsch, S. Karamcheti, et al. <a href="https://arxiv.org/abs/2406.09246">OpenVLA: An Open-Source Vision-Language-Action Model</a>. 2024.</li>
+  <li>K. Black, N. Brown, D. Driess, et al. <a href="https://arxiv.org/abs/2410.24164">π<sub>0</sub>: A Vision-Language-Action Flow Model for General Robot Control</a>. 2024.</li>
+  <li>Physical Intelligence, K. Black, N. Brown, et al. <a href="https://arxiv.org/abs/2504.16054">π<sub>0.5</sub>: a Vision-Language-Action Model with Open-World Generalization</a>. 2025.</li>
+  <li>K. Black, M. Y. Galliker, S. Levine. <a href="https://arxiv.org/abs/2506.07339">Real-Time Execution of Action Chunking Flow Policies</a>. 2025. See also <a href="https://www.pi.website/research/real_time_chunking">Real-Time Action Chunking with Large Models</a>.</li>
+  <li>M. Shukor, D. Aubakirova, F. Capuano, et al. <a href="https://arxiv.org/abs/2506.01844">SmolVLA: A Vision-Language-Action Model for Affordable and Efficient Robotics</a>. 2025.</li>
+  <li>F. Capuano, S. Palma, M. Aractingi, et al. <a href="https://huggingface.co/blog/async-robot-inference">Asynchronous Robot Inference: Decoupling Action Prediction and Execution</a>. Hugging Face, 2025.</li>
+</ol>
