@@ -66,6 +66,47 @@
 
 <p>A robot is a different kind of client. Every robot runs its own closed control loop, on its own clock, and a late answer is not a slow page load: the arm stops, or acts on a stale plan. Cloud robotics work such as FogROS2<sup><a href="#r6">6</a></sup> showed that offloading heavy computation is worth it, but a cloud that serves one robot per GPU is too expensive to be the default. So the question we care about is simple to state. Can several robots share one copy of a vision language action model without any of them waiting longer than its control loop allows?</p>
 
+<figure>
+<svg viewBox="0 0 680 270" role="img" aria-label="One robot's control loop, and three robots each on their own clock">
+  <defs>
+    <marker id="la" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#111"/></marker>
+  </defs>
+  <g font-size="12">
+    <text x="20" y="22" fill="#6b6b6b">One robot's loop</text>
+    <path d="M195 52 A88 88 0 0 1 258 112" fill="none" stroke="#111" stroke-width="1.5" marker-end="url(#la)"/>
+    <path d="M262 160 A88 88 0 0 1 200 218" fill="none" stroke="#111" stroke-width="1.5" marker-end="url(#la)"/>
+    <path d="M140 220 A88 88 0 0 1 80 165" fill="none" stroke="#111" stroke-width="1.5" marker-end="url(#la)"/>
+    <path d="M78 108 A88 88 0 0 1 138 52" fill="none" stroke="#111" stroke-width="1.5" marker-end="url(#la)"/>
+    <rect x="112" y="30" width="116" height="30" rx="6" fill="#fff" stroke="#cfcfcf"/><text x="170" y="49" text-anchor="middle">observe</text>
+    <rect x="212" y="120" width="124" height="30" rx="6" fill="#e9eef4" stroke="#2f5d8a"/><text x="274" y="139" text-anchor="middle" fill="#2f5d8a">send to the GPU</text>
+    <rect x="112" y="210" width="116" height="30" rx="6" fill="#e9eef4" stroke="#2f5d8a"/><text x="170" y="229" text-anchor="middle" fill="#2f5d8a">infer a chunk</text>
+    <rect x="12" y="120" width="116" height="30" rx="6" fill="#fff" stroke="#cfcfcf"/><text x="70" y="139" text-anchor="middle">act at 15 Hz</text>
+    <text x="170" y="131" text-anchor="middle" fill="#6b6b6b">never stops,</text>
+    <text x="170" y="147" text-anchor="middle" fill="#6b6b6b">never waits</text>
+
+    <text x="370" y="22" fill="#6b6b6b">Three robots, no shared clock</text>
+    <line x1="370" y1="250" x2="665" y2="250" stroke="#cfcfcf"/>
+    <text x="665" y="266" text-anchor="end" fill="#6b6b6b">time</text>
+
+    <text x="370" y="66" font-weight="600">A · 15 Hz</text>
+    <g stroke="#2f5d8a" opacity="0.45"><line x1="380" y1="76" x2="380" y2="88"/><line x1="400" y1="76" x2="400" y2="88"/><line x1="420" y1="76" x2="420" y2="88"/><line x1="440" y1="76" x2="440" y2="88"/><line x1="460" y1="76" x2="460" y2="88"/><line x1="480" y1="76" x2="480" y2="88"/><line x1="500" y1="76" x2="500" y2="88"/><line x1="520" y1="76" x2="520" y2="88"/><line x1="540" y1="76" x2="540" y2="88"/><line x1="560" y1="76" x2="560" y2="88"/><line x1="580" y1="76" x2="580" y2="88"/><line x1="600" y1="76" x2="600" y2="88"/><line x1="620" y1="76" x2="620" y2="88"/><line x1="640" y1="76" x2="640" y2="88"/><line x1="660" y1="76" x2="660" y2="88"/></g>
+    <g fill="#2f5d8a"><circle cx="400" cy="82" r="5"/><circle cx="480" cy="82" r="5"/><circle cx="560" cy="82" r="5"/><circle cx="640" cy="82" r="5"/></g>
+
+    <text x="370" y="130" font-weight="600">B · 15 Hz, other phase</text>
+    <g stroke="#b5651d" opacity="0.45"><line x1="387" y1="140" x2="387" y2="152"/><line x1="407" y1="140" x2="407" y2="152"/><line x1="427" y1="140" x2="427" y2="152"/><line x1="447" y1="140" x2="447" y2="152"/><line x1="467" y1="140" x2="467" y2="152"/><line x1="487" y1="140" x2="487" y2="152"/><line x1="507" y1="140" x2="507" y2="152"/><line x1="527" y1="140" x2="527" y2="152"/><line x1="547" y1="140" x2="547" y2="152"/><line x1="567" y1="140" x2="567" y2="152"/><line x1="587" y1="140" x2="587" y2="152"/><line x1="607" y1="140" x2="607" y2="152"/><line x1="627" y1="140" x2="627" y2="152"/><line x1="647" y1="140" x2="647" y2="152"/></g>
+    <g fill="#b5651d"><circle cx="447" cy="146" r="5"/><circle cx="527" cy="146" r="5"/><circle cx="607" cy="146" r="5"/></g>
+
+    <text x="370" y="194" font-weight="600">C · 10 Hz</text>
+    <g stroke="#4a7a4a" opacity="0.45"><line x1="392" y1="204" x2="392" y2="216"/><line x1="422" y1="204" x2="422" y2="216"/><line x1="452" y1="204" x2="452" y2="216"/><line x1="482" y1="204" x2="482" y2="216"/><line x1="512" y1="204" x2="512" y2="216"/><line x1="542" y1="204" x2="542" y2="216"/><line x1="572" y1="204" x2="572" y2="216"/><line x1="602" y1="204" x2="602" y2="216"/><line x1="632" y1="204" x2="632" y2="216"/><line x1="662" y1="204" x2="662" y2="216"/></g>
+    <g fill="#4a7a4a"><circle cx="422" cy="210" r="5"/><circle cx="542" cy="210" r="5"/><circle cx="662" cy="210" r="5"/></g>
+
+    <line x1="378" y1="230" x2="378" y2="242" stroke="#888" stroke-width="1.5"/><text x="386" y="240" fill="#6b6b6b">control step</text>
+    <circle cx="482" cy="236" r="4" fill="#555"/><text x="492" y="240" fill="#6b6b6b">asks the GPU for its next chunk</text>
+  </g>
+</svg>
+<figcaption><b>Figure 1.</b> A web request is one shot. A robot's request is one turn of a loop that runs as long as the robot is on, at its own control rate and its own phase. Robots never line up their requests with each other, so any batching has to happen without asking them to.</figcaption>
+</figure>
+
 <h2>Action chunks create slack</h2>
 
 <p>Modern robot policies do not predict one action at a time. ACT<sup><a href="#r7">7</a></sup> and Diffusion Policy<sup><a href="#r8">8</a></sup> made it standard to predict a chunk of future actions, and today's large models, from OpenVLA<sup><a href="#r9">9</a></sup> to π<sub>0</sub><sup><a href="#r10">10</a></sup> and π<sub>0.5</sub><sup><a href="#r11">11</a></sup>, do the same. A chunk is a promise: the robot knows what to do for the next few steps, whether or not a new answer has arrived.</p>
@@ -104,7 +145,7 @@
     <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#9a9a9a"/></marker>
   </defs>
 </svg>
-<figcaption><b>Figure 1.</b> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</figcaption>
+<figcaption><b>Figure 2.</b> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</figcaption>
 </figure>
 
 <p>Prior work uses this slack to hide latency for one robot. Our observation is that the same slack is exactly what a server needs to batch. If a robot's answer is not needed for another 267 ms, the server is free to hold its request for part of that time and let it leave together with requests from other robots.</p>
@@ -130,7 +171,7 @@
     <text x="660" y="182" text-anchor="end" fill="#6b6b6b">time</text>
   </g>
 </svg>
-<figcaption><b>Figure 2.</b> Closed loop robots naturally fall out of phase and take turns. Each one waits for the other's whole inference before its own starts, so the GPU never sees a batch. Measured on an L4: one robot alone saw a median round trip of 368 ms; two robots sharing one copy saw 515 ms each. Running two copies side by side instead slowed every inference from 241 ms to 334 ms.</figcaption>
+<figcaption><b>Figure 3.</b> Closed loop robots naturally fall out of phase and take turns. Each one waits for the other's whole inference before its own starts, so the GPU never sees a batch. Measured on an L4: one robot alone saw a median round trip of 368 ms; two robots sharing one copy saw 515 ms each. Running two copies side by side instead slowed every inference from 241 ms to 334 ms.</figcaption>
 </figure>
 
 <p>The batching window was too short to catch the other robot, and making it longer would add the same delay to every request whether or not anyone else was coming. A fixed window is a single latency target for the whole model, which is how web serving thinks. Robots each have their own deadline, set by where they are in their chunk.</p>
@@ -159,7 +200,7 @@
     <line x1="250" y1="253" x2="290" y2="253" stroke="#555" opacity="0.35" stroke-width="2"/><text x="298" y="256" fill="#6b6b6b">slack it can spend waiting</text>
   </g>
 </svg>
-<figcaption><b>Figure 3.</b> Four robots ask at different moments. A is held until B arrives, and the pair leaves well before A's deadline; C and D do the same later. The scheduler prefers the fewest, smallest batches that keep everyone on time: two batches of two, not one batch of four.</figcaption>
+<figcaption><b>Figure 4.</b> Four robots ask at different moments. A is held until B arrives, and the pair leaves well before A's deadline; C and D do the same later. The scheduler prefers the fewest, smallest batches that keep everyone on time: two batches of two, not one batch of four.</figcaption>
 </figure>
 
 <p>Every request carries two numbers from the robot: how long its requests spend outside the worker (network, encoding and decoding, measured by the robot itself), and how much of its current chunk is left. From those the worker computes a deadline for each request: the latest moment its answer may leave and still reach the robot before the chunk runs out, with 50 ms to spare. An open batch waits for the other robots on the same copy, but only for robots that can actually arrive before the earliest deadline in the batch. A robot cannot ask again sooner than r steps after its last request, so the worker knows who is worth waiting for. Our first version waited for every robot on the copy; with four robots it formed batches of two that each waited for a partner who could not come, and 45% of answers arrived late. Waiting only for robots that can arrive fixed it.</p>
@@ -202,7 +243,7 @@
     <text x="150" y="216" fill="#111">batch p95 + round trip + 50 ms</text>
   </g>
 </svg>
-<figcaption><b>Figure 4.</b> A worked example from our SDK documentation: a slow policy whose batches of 1, 2, 4 and 8 answer in 1.09, 1.16, 1.28 and 1.61 s (p95) on an L4, for robots 47 ms from their worker. Without a declared wait it seats one robot per copy. Allowing 1.3 s seats two, 1.4 s seats four, and 1.75 s seats eight, because batching is nearly free for this model until the batch gets large.</figcaption>
+<figcaption><b>Figure 5.</b> A worked example from our SDK documentation: a slow policy whose batches of 1, 2, 4 and 8 answer in 1.09, 1.16, 1.28 and 1.61 s (p95) on an L4, for robots 47 ms from their worker. Without a declared wait it seats one robot per copy. Allowing 1.3 s seats two, 1.4 s seats four, and 1.75 s seats eight, because batching is nearly free for this model until the batch gets large.</figcaption>
 </figure>
 
 <p>This is the same trade every serving system makes, with one difference: the developer chooses it per policy, in units their robot understands, and the robot's own code decides what to do while it waits.</p>
@@ -228,7 +269,7 @@
     <text x="636" y="94" text-anchor="end" fill="#6b6b6b">whole chunk = 533 ms</text>
   </g>
 </svg>
-<figcaption><b>Figure 5.</b> π<sub>0.5</sub> (LIBERO) on an NVIDIA L4, measured on our platform from simultaneous arrival. A batch of 16 took 2,270 ms, about 142 ms per request. Only a batch of one fits a 15 Hz, 8 step chunk after the network, so on this card the scheduler correctly seats one robot per copy.</figcaption>
+<figcaption><b>Figure 6.</b> π<sub>0.5</sub> (LIBERO) on an NVIDIA L4, measured on our platform from simultaneous arrival. A batch of 16 took 2,270 ms, about 142 ms per request. Only a batch of one fits a 15 Hz, 8 step chunk after the network, so on this card the scheduler correctly seats one robot per copy.</figcaption>
 </figure>
 
 <table>
