@@ -39,6 +39,7 @@
   figcaption { font-size: 14px; color: var(--mute); line-height: 1.55; margin-top: 12px; }
   figcaption b { color: var(--ink); font-weight: 600; }
   .eq { font-family: "Source Serif 4", serif; font-style: italic; font-size: 19px; text-align: center; margin: 22px 0; }
+  mark.key { background: #fff1a8; color: inherit; padding: 1px 3px; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; font-weight: 500; }
   .note { border-left: 3px solid var(--ink); padding: 2px 0 2px 16px; color: #333; margin: 24px 0; }
   table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 8px 0 22px; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
@@ -185,7 +186,7 @@
 <figcaption><b>Figure 3.</b> A robot asks for its next chunk at the replan step and keeps executing the current one. Until the chunk runs out, an answer that arrives later costs nothing. That window is slack, and every robot has its own.</figcaption>
 </figure>
 
-<p>Prior work uses this slack to hide latency for one robot. Our observation is that the same slack is exactly what a server needs to batch. If a robot's answer is not needed for another 267 ms, the server is free to hold its request for part of that time and let it leave together with requests from other robots.</p>
+<p>Prior work uses this slack to hide latency for one robot. Our observation is that the same slack is exactly what a server needs to batch. <mark class="key">If a robot's answer is not needed for another 267 ms, the server is free to hold its request for part of that time and let it leave together with requests from other robots.</mark></p>
 
 <h2>What goes wrong without it</h2>
 
